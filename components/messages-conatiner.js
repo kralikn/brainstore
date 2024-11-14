@@ -6,7 +6,7 @@ import { Skeleton } from "./ui/skeleton";
 export default function MessagesConatiner({ messagesEndRef, messages, isPending }) {
 
   return (
-    <div className='max-h-[calc(100vh-25.75rem)] overflow-y-auto flex flex-col space-y-2 pr-2'>
+    <div className='max-h-[calc(100vh-23.75rem)] overflow-y-auto flex flex-col space-y-2 pr-2'>
       {messages && messages.map(({ role, content }, index) => {
         const icon = role === 'user' ? <User /> : <Bot />
         return <div key={index} className={`flex ${role === "user" ? "justify-end" : "justify-start"}`}>

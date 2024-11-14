@@ -6,12 +6,12 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/comp
 export default function Home() {
   return (
     <div className="h-screen flex flex-col bg-gray-50">
-      <header className="border-b border-b-foreground/10 h-16">
+      {/* <header className="border-b border-b-foreground/10 h-16">
         <div className="flex items-center w-4/5 mx-auto h-full space-x-1">
 
           <h1 className="flex items-center font-bold text-2xl">brAInstor<BrainCircuit size={22} /></h1>
         </div>
-      </header>
+      </header> */}
       <main className="flex-1 flex justify-center items-center w-4/5 mx-auto">
         <Card className="flex flex-col justify-between border-none p-4 h-[calc(40%)]">
           <CardHeader className="flex flex-col gap-1 mb-8">

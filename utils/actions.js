@@ -102,7 +102,7 @@ export async function deleteTopic(topic) {
       return null
     }
 
-    return { message: "A témakör törölve lett!" }
+    return { message: "A témakör törölve!" }
 
   } catch (error) {
     console.error(error)

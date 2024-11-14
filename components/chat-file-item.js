@@ -2,9 +2,11 @@ import SignedUrl from "./signed-url";
 
 export default function ChatFileItem({ doc }) {
 
+  const fileName = doc.doc_original_name.slice(0, -4)
+
   return (
-    <div className="flex justify-between items-start">
-      <div className="pr-1">{doc.doc_original_name}</div>
+    <div className="flex justify-between items-center gap-2">
+      <div className="">{fileName}</div>
       <SignedUrl signedUrl={doc.signedUrl} />
     </div>
   )
