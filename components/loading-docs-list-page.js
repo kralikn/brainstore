@@ -3,7 +3,7 @@ import { Skeleton } from "./ui/skeleton";
 export default function LoadingDocsListPage() {
   return (
     <div className="flex flex-col gap-4">
-      <div className="h-40">
+      <div className="h-35">
         <Skeleton className="h-full w-full rounded-md bg-gray-200" />
       </div>
       <div className="flex flex-col gap-3">

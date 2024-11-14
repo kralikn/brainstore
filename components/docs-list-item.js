@@ -9,7 +9,7 @@ export default function DocsLisItem({ doc, topicSlug }) {
   return (
     <div className="flex justify-between items-center pl-7 pr-6 py-4 border rounded-md border-t-foreground/10">
       <div className="flex space-x-4">
-        <p>{doc_original_name}</p>
+        <p>{doc_original_name.slice(0, -4)}</p>
       </div>
       <div className="space-x-4">
         <SignedUrl signedUrl={signedUrl} />

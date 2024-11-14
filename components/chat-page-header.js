@@ -6,6 +6,7 @@ import { getFileListForChat } from '@/utils/actions';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import LoadingChatPageHeader from './loading-chat-page-header';
 
 
 export default function ChatPageHeader({ topicId }) {
@@ -17,7 +18,8 @@ export default function ChatPageHeader({ topicId }) {
 
   const topicTitle = data?.topicTitle || ''
 
-  // if (isLoading) return <h2 className='text-xl'>Please Wait...</h2>;
+  if (isLoading) return <LoadingChatPageHeader />
+
   return (
     <Card className="bg-gray-50 border-none">
       <CardHeader className="pt-3" >
