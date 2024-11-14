@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Input } from './ui/input'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { uploadFile } from '@/utils/actions'
+import { CloudUpload, Loader2 } from 'lucide-react'
 
 
 export default function FileUploadForm({ topicSlug }) {
@@ -56,7 +57,9 @@ export default function FileUploadForm({ topicSlug }) {
         accept="application/pdf"
         {...register("topic_file")}
       />
-      <Button type="submit" disabled={isPending}>Feltöltés</Button>
+      <Button type="submit" disabled={isPending}>
+        {isPending ? <Loader2 className="animate-spin" /> : <CloudUpload />} Feltöltés
+      </Button>
     </form>
   )
 }

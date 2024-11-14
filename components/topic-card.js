@@ -6,7 +6,7 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/c
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useToast } from "@/hooks/use-toast"
 import { deleteTopic } from "@/utils/actions"
-import { MessageSquareMore, Pencil, Trash2 } from "lucide-react"
+import { Loader2, MessageSquareMore, Pencil, Trash2 } from "lucide-react"
 import { Badge } from "./ui/badge"
 
 export default function TopicCard({ topic }) {
@@ -54,7 +54,7 @@ export default function TopicCard({ topic }) {
 
         </div>
         <Button size='sm' variant="destructive" onClick={() => handleSubmit(topic)} disabled={isPending}>
-          <Trash2 /> Törlés
+          {isPending ? <Loader2 className="animate-spin" /> : <Trash2 />} Törlés
         </Button>
       </CardFooter>
     </Card>

@@ -3,17 +3,18 @@
 import { getAllTopics } from "@/utils/actions"
 import TopicCard from "./topic-card"
 import { useQuery } from "@tanstack/react-query"
+import LoadingTopics from "./loading-topics"
 
 export default function TopicList() {
 
-  const { data, isPending } = useQuery({
+  const { data, isRefetching } = useQuery({
     queryKey: ['topics'],
     queryFn: () => getAllTopics()
   })
 
   const topics = data || []
 
-  if (isPending) return <h2 className='text-xl'>Kérlek várj...</h2>
+  if (isRefetching) return <LoadingTopics />
 
   return (
     <div className="grid lg:grid-cols-2 gap-4">

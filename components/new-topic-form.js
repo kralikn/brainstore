@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form"
 import { createTopic } from "@/utils/actions"
+import { FolderPlus, Loader2, SquarePlus } from "lucide-react"
 
 const formSchema = z.object({
   topic_title: z.string().min(3, {
@@ -72,7 +73,9 @@ export default function NewTopicForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isPending}>Létrehozás</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? <Loader2 className="animate-spin" /> : <FolderPlus />}Létrehozás
+            </Button>
           </form>
         </Form>
       </CardContent>

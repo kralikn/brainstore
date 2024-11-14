@@ -9,7 +9,7 @@ import MessagesConatiner from "./messages-conatiner";
 import { Form, FormControl, FormField, FormItem, FormMessage } from './ui/form'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
-import { SendHorizontal } from 'lucide-react'
+import { Loader2, SendHorizontal } from 'lucide-react'
 import { useMutation } from "@tanstack/react-query";
 import { generateChatResponse } from "@/utils/actions";
 import { CardDescription } from "./ui/card";
@@ -48,6 +48,7 @@ export default function ChatWindow({ topicId }) {
         toast({
           description: 'Valami hiba történt...',
         });
+        form.reset()
         return;
       }
       form.reset()
@@ -90,7 +91,7 @@ export default function ChatWindow({ topicId }) {
               )}
             />
             <Button type="submit" disabled={isPending}>
-              <SendHorizontal />
+              {isPending ? <Loader2 className="animate-spin" /> : <SendHorizontal />}
             </Button>
           </form>
         </Form>

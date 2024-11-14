@@ -12,7 +12,7 @@ export default async function Navbar() {
   }
 
   return (
-    <div className="h-20 flex justify-between items-center space-x-4 px-8 bg-gray-50">
+    <div className="h-20 flex justify-between items-center space-x-4 px-8">
       <div>
         {/* <LinkDropdown /> */}
       </div>

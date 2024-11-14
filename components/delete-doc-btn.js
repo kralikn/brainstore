@@ -3,7 +3,7 @@
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "./ui/button";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { deleteDocument } from "@/utils/actions";
 
 
@@ -31,7 +31,7 @@ export default function DeleteDocButton({ doc, topicSlug }) {
   }
   return (
     <Button onClick={() => handleSubmit(doc)} size="sm" variant="destructive" disabled={isPending}>
-      <Trash2 /> Törlés
+      {isPending ? <Loader2 className="animate-spin" /> : <Trash2 />} Törlés
     </Button>
 
   )

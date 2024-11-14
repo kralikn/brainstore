@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, BrainCircuitIcon } from "lucide-react";
+import { Brain, BrainCircuit, BrainCircuitIcon } from "lucide-react";
 import { socialAuth } from "@/utils/actions"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -15,8 +15,11 @@ export default function Home() {
       <main className="flex-1 flex justify-center items-center w-4/5 mx-auto">
         <Card className="flex flex-col justify-between border-none p-4 h-[calc(40%)]">
           <CardHeader className="flex flex-col gap-1 mb-8">
-            <CardTitle className="flex items-center gap-1 text-6xl">
-              brAInstor<BrainCircuitIcon size={54} />
+            <CardTitle className="flex flex-row items-center gap-1 text-6xl">
+              <span>brAInst</span>
+              <span className="-ml-0.5 -mr-1 mt-0.5"><Brain size={46} /></span>
+              <span>re</span>
+              {/* brAInst<Brain />r<BrainCircuitIcon size={54} /> */}
             </CardTitle>
             <CardDescription className="text-xl">dokumentum alapú tudástár</CardDescription>
           </CardHeader>

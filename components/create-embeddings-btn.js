@@ -1,6 +1,6 @@
 'use client'
 
-import { FileStack } from "lucide-react";
+import { FileStack, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -34,7 +34,7 @@ export default function CreateEmbeddingsButton({ doc, topicSlug }) {
 
   return (
     <Button onClick={() => handleSubmit(doc)} size='sm' variant="" disabled={embedded || isPending}>
-      <FileStack /> Feldolgozás
+      {isPending ? <Loader2 className="animate-spin" /> : <FileStack />} Feldolgozás
     </Button>
 
   )

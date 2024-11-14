@@ -5,18 +5,19 @@ import DocsLisItem from "./docs-list-item";
 import { CloudDownload } from "lucide-react";
 import { getFiles } from "@/utils/actions"
 import { useQueryClient } from "@tanstack/react-query";
+import LoadingDocsList from "./loading-docs-list";
 
 
 export default function DocsList({ topicSlug }) {
 
-  const { data, isLoading } = useQuery({
+  const { data, isRefetching } = useQuery({
     queryKey: ['topic', topicSlug],
     queryFn: () => getFiles(topicSlug),
   })
 
   const docs = data?.docs || []
 
-  if (isLoading) return <h2 className='text-xl'>Please Wait...</h2>;
+  if (isRefetching) return <LoadingDocsList />
 
   return (
     <div className="flex flex-col gap-3">

@@ -4,7 +4,8 @@ import links from '@/utils/links';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { usePathname } from 'next/navigation';
-import { BrainCircuit, Radar } from 'lucide-react';
+import { Brain, BrainCircuit, Radar } from 'lucide-react';
+import { CardTitle } from './ui/card';
 
 export default function Sidebar() {
 
@@ -12,9 +13,11 @@ export default function Sidebar() {
 
   return (
     <div className="h-full bg-gray-50">
-      <div className="h-20 flex justify-center items-center px-8 space-x-2">
-        <h1 className="flex items-center  font-bold text-2xl">brAInstor<BrainCircuit size={22} /></h1>
-      </div>
+      <CardTitle className="h-20 flex flex-row justify-center items-center gap-1 text-4xl">
+        <span>brAInst</span>
+        <span className="-ml-0.5 -mr-1 mt-0.25"><Brain size={28} /></span>
+        <span>re</span>
+      </CardTitle>
 
       <div className="row-span-11 flex flex-col gap-y-4 pt-4 px-8">
         {links.map((link) => {

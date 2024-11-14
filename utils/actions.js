@@ -111,6 +111,8 @@ export async function deleteTopic(topic) {
 }
 export async function getAllTopics() {
 
+  // await new Promise(resolve => setTimeout(resolve, 2000))
+
   try {
     const supabase = await createClient()
     const { data, error } = await supabase
@@ -148,6 +150,8 @@ export async function getAllTopics() {
   }
 }
 export async function getFiles(topicSlug) {
+
+  // await new Promise(resolve => setTimeout(resolve, 8000))
 
   try {
     const supabase = await createClient()
@@ -280,7 +284,7 @@ export async function deleteDocument(doc) {
     }
 
 
-    return { message: "A fájl törölve lett!" }
+    return { message: "A fájl törölve!" }
 
   } catch (error) {
     console.error(error)

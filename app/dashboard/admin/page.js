@@ -1,3 +1,4 @@
+import LoadingTopics from "@/components/loading-topics"
 import NewTopicForm from "@/components/new-topic-form"
 import TopicList from "@/components/topic-list"
 import { getAllTopics } from "@/utils/actions"
@@ -6,22 +7,27 @@ import {
   HydrationBoundary,
   QueryClient,
 } from '@tanstack/react-query'
+import { Suspense } from "react"
 
-export default async function AdminPage() {
-
-  const queryClient = new QueryClient()
-
+const queryClient = new QueryClient()
+async function Topics() {
   await queryClient.prefetchQuery({
     queryKey: ['topics'],
     queryFn: () => getAllTopics(),
   })
+  return <TopicList />
+}
+
+export default async function AdminPage() {
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col gap-4">
-        <NewTopicForm />
-        <TopicList />
-      </div>
-    </HydrationBoundary>
+    <div className="flex flex-col gap-4">
+      <NewTopicForm />
+      <Suspense fallback={<LoadingTopics />}>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <Topics />
+        </HydrationBoundary>
+      </Suspense>
+    </div>
   )
 }
