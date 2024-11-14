@@ -17,7 +17,7 @@ export default function ChatPageHeader({ topicId }) {
 
   const topicTitle = data?.topicTitle || ''
 
-  if (isLoading) return <h2 className='text-xl'>Please Wait...</h2>;
+  // if (isLoading) return <h2 className='text-xl'>Please Wait...</h2>;
   return (
     <Card className="bg-gray-50 border-none">
       <CardHeader className="pt-3" >

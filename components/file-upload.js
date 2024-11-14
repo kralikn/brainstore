@@ -8,6 +8,7 @@ import { getFiles } from '@/utils/actions'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import FileUploadForm from './file-upload-form'
+import LoadingDocsListHeader from './loading-docs-list-header'
 
 export default function FileUpload({ topicSlug }) {
 
@@ -17,6 +18,8 @@ export default function FileUpload({ topicSlug }) {
   })
 
   const topicTitle = data?.topicTitle || ""
+
+  if (isLoading) return <LoadingDocsListHeader />
 
   return (
     <Card className="bg-gray-50 border-none flex justify-between items-end">
