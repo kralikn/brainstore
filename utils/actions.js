@@ -9,7 +9,6 @@ import OpenAI from 'openai'
 import { encodingForModel } from "js-tiktoken";
 
 const openAIApiKey = process.env.OPEN_AI_KEY
-
 const openai = new OpenAI({
   apiKey: openAIApiKey
 })
