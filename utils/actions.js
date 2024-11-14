@@ -6,14 +6,13 @@ import { redirect } from 'next/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import PdfParse from 'pdf-parse/lib/pdf-parse'
 import OpenAI from 'openai'
-import { getEncoding, encodingForModel } from "js-tiktoken";
-import assert from "node:assert"
+import { encodingForModel } from "js-tiktoken";
 
-const openAIApiKey = process.env.OPEN_AI_KEY
+// const openAIApiKey = process.env.OPEN_AI_KEY
 
-const openai = new OpenAI({
-  apiKey: openAIApiKey
-})
+// const openai = new OpenAI({
+//   apiKey: openAIApiKey
+// })
 
 export async function socialAuth() {
   const supabase = await createClient()
