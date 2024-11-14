@@ -2,7 +2,6 @@ import { Skeleton } from "./ui/skeleton";
 
 export default function LoadingDocsList() {
   return (
-
     <div className="flex flex-col gap-3">
       <div className="flex justify-between items-center gap-3">
         <div className="h-10 w-3/5">

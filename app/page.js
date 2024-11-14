@@ -16,10 +16,9 @@ export default function Home() {
         <Card className="flex flex-col justify-between border-none p-4 h-[calc(40%)]">
           <CardHeader className="flex flex-col gap-1 mb-8">
             <CardTitle className="flex flex-row items-center gap-1 text-6xl">
-              <span>brAInst</span>
-              <span className="-ml-0.5 -mr-1 mt-0.5"><Brain size={46} /></span>
+              <span>brainst</span>
+              <span className="-ml-0.5 -mr-1.5 mb-1"><Brain size={54} className="animate-pulse" /></span>
               <span>re</span>
-              {/* brAInst<Brain />r<BrainCircuitIcon size={54} /> */}
             </CardTitle>
             <CardDescription className="text-xl">dokumentum alapú tudástár</CardDescription>
           </CardHeader>

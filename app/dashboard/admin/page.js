@@ -11,7 +11,7 @@ import { Suspense } from "react"
 
 const queryClient = new QueryClient()
 async function Topics() {
-  await queryClient.prefetchQuery({
+  await queryClient.fetchQuery({
     queryKey: ['topics'],
     queryFn: () => getAllTopics(),
   })

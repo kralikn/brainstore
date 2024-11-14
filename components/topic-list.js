@@ -7,14 +7,14 @@ import LoadingTopics from "./loading-topics"
 
 export default function TopicList() {
 
-  const { data, isRefetching } = useQuery({
+  const { data, isPending, isFetching } = useQuery({
     queryKey: ['topics'],
     queryFn: () => getAllTopics()
   })
 
   const topics = data || []
 
-  if (isRefetching) return <LoadingTopics />
+  if (isPending || isFetching) return <LoadingTopics />
 
   return (
     <div className="grid lg:grid-cols-2 gap-4">
