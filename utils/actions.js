@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import PdfParse from 'pdf-parse/lib/pdf-parse'
 import OpenAI from 'openai'
-import { encodingForModel } from "js-tiktoken";
+// import { encodingForModel } from "js-tiktoken";
 
 const openAIApiKey = process.env.OPEN_AI_KEY
 const openai = new OpenAI({
@@ -398,8 +398,6 @@ export async function getFileListForChat(topicId) {
 
 }
 export async function generateChatResponse({ prevMessages, query, topicId }) {
-  // console.log(prevMessages);
-  // console.log(query);
   const supabase = await createClient()
 
   // 1. standalone question
@@ -462,27 +460,19 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
     messagesForPrompt = [{ role: "system", content: systemContent }, ...prevMessages, { role: "user", content: prompt }]
   }
 
-  const enc = encodingForModel("gpt-4o-mini")
-  console.log(enc.encode(prompt).length);
-  console.log(enc.encode(systemContent).length);
+  // const enc = encodingForModel("gpt-4o-mini")
+  // console.log(enc.encode(prompt).length);
+  // console.log(enc.encode(systemContent).length);
 
   const completion = await openai.chat.completions.create({
     messages: messagesForPrompt,
     model: "gpt-4o-mini",
-    // max_tokens: 100,
     temperature: 0
   })
-
-  // // console.log(completion.usage);
-
   const { prompt_tokens, completion_tokens, total_tokens } = completion.usage
-
   const { role, content } = completion.choices[0].message
 
   return { message: { role, content }, tokens: { prompt_tokens, completion_tokens, total_tokens } }
-
-  // return null
-
 }
 
 
