@@ -13,8 +13,6 @@ export default function TopicList() {
 
   const topics = data || []
 
-  console.log("topics on client: ", topics);
-
   if (isPending) return <h2 className='text-xl'>Kérlek várj...</h2>
 
   return (

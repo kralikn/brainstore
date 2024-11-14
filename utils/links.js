@@ -16,11 +16,11 @@ const links = [
     label: 'témakör létrehozás',
     icon: <FolderPlus />,
   },
-  {
-    href: '/dashboard/admin/users',
-    label: 'felhasználók',
-    icon: <Users />,
-  },
+  // {
+  //   href: '/dashboard/admin/users',
+  //   label: 'felhasználók',
+  //   icon: <Users />,
+  // },
   {
     href: '/dashboard/admin/demo',
     label: 'demó',

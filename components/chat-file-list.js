@@ -22,7 +22,7 @@ export default function ChatFileList({ topicId }) {
         <CardTitle className="">Források</CardTitle>
         <CardDescription>{`${docsCount} dokumentum`}</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         {docs.map(doc => {
           return <ChatFileItem key={doc.id} doc={doc} />
         })}

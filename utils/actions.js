@@ -5,7 +5,9 @@ import { createClient } from "./supabase/server"
 import { redirect } from 'next/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import PdfParse from 'pdf-parse/lib/pdf-parse'
-import OpenAI from 'openai';
+import OpenAI from 'openai'
+import { getEncoding, encodingForModel } from "js-tiktoken";
+import assert from "node:assert"
 
 const openAIApiKey = process.env.OPEN_AI_KEY
 
@@ -192,7 +194,7 @@ export async function uploadFile(data) {
 
   const { formData, topicSlug } = data
 
-  console.log(data);
+  // console.log(data);
 
   const file = formData.get('topic_file')
   const result = fileSchema.safeParse({ file })
@@ -312,17 +314,31 @@ export async function createEmbeddings(doc) {
   const pdfData = await data.arrayBuffer()
   const docContent = await PdfParse(pdfData)
 
-  const cleanPageBreaks = docContent.text.replace(/\n\n \n/g, '\n \n')
-  const chaptersArray = cleanPageBreaks.split(' \n \n \n')
+  const cleanPageBreaks = docContent.text
+    .replace(/^\d+\s*\n/gm, '')             // hivatkozási számok eltávolítása
+  // .replace(/\n\n \n/g, '\n \n')
+  // .replace(/\d+\n/g, '')
+  // .replace(/\.+/g, '')
+  // .replace(//g, '-')
+  // .replace(/•/g, '-')
+
+  const chaptersArray = cleanPageBreaks.split(' \n \n \n \n')
+
+  const cleanedChaptersArray = []
+  chaptersArray.forEach(chapter => {
+    if (chapter.length !== 0) cleanedChaptersArray.push(chapter.replace(/\s+/g, ' ').trim())
+  })
+  // console.log(chaptersArray.length);
+  // console.log(cleanedChaptersArray.length);
 
   const embedding = await openai.embeddings.create({
     model: "text-embedding-3-small",
-    input: chaptersArray,
+    input: cleanedChaptersArray,
     encoding_format: "float",
   })
 
   const documentSections = embedding.data.map((item, index) => {
-    return { content: chaptersArray[index], embedding: item.embedding, doc_id: id, topic_id }
+    return { content: cleanedChaptersArray[index], embedding: item.embedding, doc_id: id, topic_id }
   })
 
   const { error: insertedError } = await supabase
@@ -383,51 +399,39 @@ export async function getFileListForChat(topicId) {
   }
 
 }
-export async function generateChatResponse({ query, topicId }) {
-
-  // console.log("query on server: ", query)
-  // const question = "Mi a számla?"
-
+export async function generateChatResponse({ prevMessages, query, topicId }) {
+  // console.log(prevMessages);
+  // console.log(query);
   const supabase = await createClient()
-  // const { data: questionEmbeddings } = await supabase
-  //   .from('questions')
-  //   .select()
-
-  // console.log(questionEmbeddings)
-
 
   // 1. standalone question
-
-  // 2. embedding question
 
   const queryEmbeddingResponse = await openai.embeddings.create({
     model: "text-embedding-3-small",
     input: query.content,
     encoding_format: "float",
-  });
+  })
   const queryEmbedding = queryEmbeddingResponse.data[0].embedding
 
+  // ----------------------------------------------------------------------------
+  // const { data: questionEmbeddings } = await supabase
+  //   .from('questions')
+  //   .select()
+  // console.log(questionEmbeddings)
   // const newQuestion = {
   //   content: question,
   //   embedding: queryEmbedding
   // }
-
   // await supabase
   //   .from('questions')
   //   .insert(newQuestion)
+  // ----------------------------------------------------------------------------
 
   // query in db document_sections
 
-  // let { data, error } = await supabase
-  //   .rpc('match_documents_by_doc_id', {
-  //     match_count: 2,
-  //     p_topic_id: topicId,
-  //     query_embedding: queryEmbedding
-  //   })
-
   let { data, error } = await supabase
     .rpc('match_documents_by_topic_id', {
-      match_count: 2,
+      match_count: 3,
       p_topic_id: topicId,
       query_embedding: queryEmbedding
     })
@@ -443,33 +447,44 @@ export async function generateChatResponse({ query, topicId }) {
     }
   })
 
-  const prompt = `
-    Felhasználó kérdése: "${query.content}"
-    Kontextus:
-    ${context}`
+  const prompt = `Felhasználó aktuális kérdése/kérése: "${query.content}"
+  Kontextus:
+  ${context}`
 
-  const systemContent = `Te egy mesterséges intelligenciával működő asszisztens vagy, amely segít a felhasználónak kérdéseket megválaszolni a megadott dokumentumrészletek alapján.
-                        Csak az itt megadott információkat használd a pontos válasz megfogalmazásához.
-                        Ha a megadott kontextusból nem tudsz egyértelmű választ adni, kérlek, válaszolj a következő sablon szerint:
-                        "Sajnálom, de a rendelkezésre álló információk alapján nem tudok válaszolni erre a kérdésre."`
+  const systemContent = `Te egy mesterséges intelligenciával működő asszisztens vagy, amely segít a felhasználónak kérdéseket megválaszolni a megadott dokumentumrészletek és a korábbi beszélgetés alapján.
+                        Csak az itt megadott és a korábbi üzenetekben található információkat használd a pontos válasz megfogalmazásához.
+                        Ha a megadott információkból nem tudsz egyértelmű választ adni, kérlek, válaszolj a következő sablon szerint:
+                        "Sajnálom, de a rendelkezésre álló információk alapján erre a kérdésre jelenleg nem tudok válaszolni."`
+
+  let messagesForPrompt = []
+  if (prevMessages.length < 1) {
+    messagesForPrompt = [{ role: "system", content: systemContent }, { role: "user", content: prompt }]
+  } else {
+    // messagesForPrompt = [{ role: "system", content: systemContent }, { role: "user", content: prompt }]
+    messagesForPrompt = [{ role: "system", content: systemContent }, ...prevMessages, { role: "user", content: prompt }]
+  }
+
+  const enc = encodingForModel("gpt-4o-mini")
+  console.log(enc.encode(prompt).length);
+  console.log(enc.encode(systemContent).length);
 
   const completion = await openai.chat.completions.create({
-    messages: [
-      {
-        role: "system", content: systemContent
-      },
-      { role: "user", content: prompt },
-    ],
+    messages: messagesForPrompt,
     model: "gpt-4o-mini",
     // max_tokens: 100,
     temperature: 0
-  });
+  })
+
+  // // console.log(completion.usage);
+
+  const { prompt_tokens, completion_tokens, total_tokens } = completion.usage
 
   const { role, content } = completion.choices[0].message
 
-  return { message: { role, content } }
+  return { message: { role, content }, tokens: { prompt_tokens, completion_tokens, total_tokens } }
 
   // return null
+
 }
 
 
