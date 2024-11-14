@@ -8,11 +8,11 @@ import PdfParse from 'pdf-parse/lib/pdf-parse'
 import OpenAI from 'openai'
 import { encodingForModel } from "js-tiktoken";
 
-// const openAIApiKey = process.env.OPEN_AI_KEY
+const openAIApiKey = process.env.OPEN_AI_KEY
 
-// const openai = new OpenAI({
-//   apiKey: openAIApiKey
-// })
+const openai = new OpenAI({
+  apiKey: openAIApiKey
+})
 
 export async function socialAuth() {
   const supabase = await createClient()
