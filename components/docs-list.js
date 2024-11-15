@@ -10,14 +10,14 @@ import LoadingDocsList from "./loading-docs-list";
 
 export default function DocsList({ topicSlug }) {
 
-  const { data, isRefetching } = useQuery({
+  const { data, isLoading, isRefetching } = useQuery({
     queryKey: ['topic', topicSlug],
     queryFn: () => getFiles(topicSlug),
   })
 
   const docs = data?.docs || []
 
-  if (isRefetching) return <LoadingDocsList />
+  if (isLoading || isRefetching) return <LoadingDocsList />
 
   return (
     <div className="flex flex-col gap-3">
