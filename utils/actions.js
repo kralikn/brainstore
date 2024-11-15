@@ -468,11 +468,12 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
     // const enc = encodingForModel("gpt-4o-mini")
     // console.log(enc.encode(prompt).length);
     // console.log(enc.encode(systemContent).length);
-
+    console.log(prompt);
     try {
       const completion = await openai.chat.completions.create({
         messages: messagesForPrompt,
         model: "gpt-4o-mini",
+        max_completion_tokens: 1500,
         temperature: 0
       })
       const { prompt_tokens, completion_tokens, total_tokens } = completion.usage
