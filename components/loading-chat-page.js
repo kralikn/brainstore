@@ -6,7 +6,7 @@ export default function LoadingChatPage() {
       <div className="h-32">
         <Skeleton className="h-full w-full rounded-md bg-gray-200" />
       </div>
-      <div className='grid grid-cols-12 min-h-[calc(100vh-16rem)] gap-4'>
+      <div className='grid grid-cols-12 min-h-[calc(100vh-18rem)] gap-4'>
         <div className='col-span-7'>
           <Skeleton className="h-full w-full rounded-md bg-gray-200" />
         </div>
