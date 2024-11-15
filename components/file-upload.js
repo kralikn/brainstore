@@ -12,14 +12,14 @@ import LoadingDocsListHeader from './loading-docs-list-header'
 
 export default function FileUpload({ topicSlug }) {
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isPending } = useQuery({
     queryKey: ['topic', topicSlug],
     queryFn: () => getFiles(topicSlug),
   })
 
   const topicTitle = data?.topicTitle || ""
 
-  if (isLoading) return <LoadingDocsListHeader />
+  if (isLoading || isPending) return <LoadingDocsListHeader />
 
   return (
     <Card className="bg-gray-50 border-none flex justify-between items-end">
