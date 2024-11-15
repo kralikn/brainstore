@@ -11,14 +11,14 @@ import LoadingChatPageHeader from './loading-chat-page-header';
 
 export default function ChatPageHeader({ topicId }) {
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isPending } = useQuery({
     queryKey: ['chat', topicId],
     queryFn: () => getFileListForChat(topicId),
   })
 
   const topicTitle = data?.topicTitle || ''
 
-  if (isLoading) return <LoadingChatPageHeader />
+  if (isLoading || isPending) return <LoadingChatPageHeader />
 
   return (
     <Card className="bg-gray-50 border-none">
