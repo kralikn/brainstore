@@ -20,7 +20,7 @@ export default function Home() {
               <span className="-ml-0.5 -mr-1.5 mb-1"><Brain size={54} className="animate-pulse" /></span>
               <span>re</span>
             </CardTitle>
-            <CardDescription className="text-xl">dokumentum alapú tudástár</CardDescription>
+            <CardDescription className="text-base">dokumentum alapú tudástár</CardDescription>
           </CardHeader>
           <CardFooter>
             <Button onClick={socialAuth} className="text-md">belépés Google-fiókkal</Button>

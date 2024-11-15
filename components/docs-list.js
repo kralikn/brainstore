@@ -2,9 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import DocsLisItem from "./docs-list-item";
-import { CloudDownload } from "lucide-react";
 import { getFiles } from "@/utils/actions"
-import { useQueryClient } from "@tanstack/react-query";
 import LoadingDocsList from "./loading-docs-list";
 
 

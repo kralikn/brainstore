@@ -4,17 +4,20 @@ import { getFileListForChat } from "@/utils/actions"
 import { useQuery } from "@tanstack/react-query"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import ChatFileItem from "./chat-file-item"
+import LoadingChatFileList from "./loading-chat-file-list"
 
 export default function ChatFileList({ topicId }) {
 
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isPending } = useQuery({
     queryKey: ['chat', topicId],
     queryFn: () => getFileListForChat(topicId),
   })
 
   const docs = data?.docs || []
   const docsCount = data?.docsCount || 0
+
+  if (isLoading || isPending) return <LoadingChatFileList />
 
   return (
     <Card className="h-full">
