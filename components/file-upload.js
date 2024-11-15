@@ -19,7 +19,7 @@ export default function FileUpload({ topicSlug }) {
 
   const topicTitle = data?.topicTitle || ""
 
-  if (isPending) return <LoadingDocsListHeader />
+  if (isLoading || isPending) return <LoadingDocsListHeader />
 
   return (
     <Card className="bg-gray-50 border-none flex justify-between items-end">
