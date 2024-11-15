@@ -408,47 +408,45 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
     const supabase = await createClient()
 
     // 1. standalone question
-
-    const queryEmbeddingResponse = await openai.embeddings.create({
-      model: "text-embedding-3-small",
-      input: query.content,
-      encoding_format: "float",
-    })
-    const queryEmbedding = queryEmbeddingResponse.data[0].embedding
-
-    // ----------------------------------------------------------------------------
-    // const { data: questionEmbeddings } = await supabase
-    //   .from('questions')
-    //   .select()
-    // console.log(questionEmbeddings)
-    // const newQuestion = {
-    //   content: question,
-    //   embedding: queryEmbedding
-    // }
-    // await supabase
-    //   .from('questions')
-    //   .insert(newQuestion)
-    // ----------------------------------------------------------------------------
-
-    // query in db document_sections
-
-    let { data, error } = await supabase
-      .rpc('match_documents_by_topic_id', {
-        match_count: 3,
-        p_topic_id: topicId,
-        query_embedding: queryEmbedding
+    let queryEmbedding
+    try {
+      const queryEmbeddingResponse = await openai.embeddings.create({
+        model: "text-embedding-3-small",
+        input: query.content,
+        encoding_format: "float",
       })
+      queryEmbedding = queryEmbeddingResponse.data[0].embedding
 
-    if (error) console.error(error)
+    } catch (error) {
+      console.error("Hiba az embedding létrehozása közben:", error);
+      return { message: "Hiba történt az embedding létrehozása során." };
+    }
 
     let context = ''
-    data.map((item, index) => {
-      if (index + 1 === data.length) {
-        context += `${item.content.trim()}`
-      } else {
-        context += `${item.content.trim()}\n\n---\n\n`
+    try {
+      let { data, error } = await supabase
+        .rpc('match_documents_by_topic_id', {
+          match_count: 3,
+          p_topic_id: topicId,
+          query_embedding: queryEmbedding
+        })
+
+      if (error) {
+        console.error("Hiba az RPC hívás során:", error);
+        return { message: "Hiba történt a dokumentumok lekérése során." };
       }
-    })
+
+      data.map((item, index) => {
+        if (index + 1 === data.length) {
+          context += `${item.content.trim()}`
+        } else {
+          context += `${item.content.trim()}\n\n---\n\n`
+        }
+      })
+    } catch (error) {
+      console.error("Hiba a dokumentum lekérdezése során:", error);
+      return { message: "Hiba történt a dokumentumok adatbázisból való lekérése során." };
+    }
 
     const prompt = `Felhasználó aktuális kérdése/kérése: "${query.content}"
     Kontextus:
@@ -471,17 +469,24 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
     // console.log(enc.encode(prompt).length);
     // console.log(enc.encode(systemContent).length);
 
-    const completion = await openai.chat.completions.create({
-      messages: messagesForPrompt,
-      model: "gpt-4o-mini",
-      temperature: 0
-    })
-    const { prompt_tokens, completion_tokens, total_tokens } = completion.usage
-    const { role, content } = completion.choices[0].message
+    try {
+      const completion = await openai.chat.completions.create({
+        messages: messagesForPrompt,
+        model: "gpt-4o-mini",
+        temperature: 0
+      })
+      const { prompt_tokens, completion_tokens, total_tokens } = completion.usage
+      const { role, content } = completion.choices[0].message
 
-    return { message: { role, content }, tokens: { prompt_tokens, completion_tokens, total_tokens } }
+      return { message: { role, content }, tokens: { prompt_tokens, completion_tokens, total_tokens } }
+
+    } catch (error) {
+      console.error("Hiba a chat completion során:", error);
+      return { message: "Hiba történt a válasz generálása során." };
+    }
   } catch (error) {
-    return { message: error.message }
+    console.error("Általános hiba:", error);
+    return { message: "Általános hiba történt a függvény futtatása közben." };
   }
 }
 

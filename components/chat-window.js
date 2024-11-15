@@ -59,11 +59,11 @@ export default function ChatWindow({ topicId }) {
         prompt_tokens: data.tokens.prompt_tokens
       }))
     },
-    onError: (data) => {
+    onError: (error) => {
       toast({
-        description: data.message,
+        description: error.message || 'Ismeretlen hiba történt...',
       });
-      form.reset()
+      form.reset();
     }
   })
 
