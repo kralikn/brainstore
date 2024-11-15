@@ -63,6 +63,7 @@ export default function ChatWindow({ topicId }) {
       toast({
         description: data.message,
       });
+      form.reset()
     }
   })
 
