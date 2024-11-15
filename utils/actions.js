@@ -402,81 +402,87 @@ export async function getFileListForChat(topicId) {
 
 }
 export async function generateChatResponse({ prevMessages, query, topicId }) {
-  const supabase = await createClient()
 
-  // 1. standalone question
+  try {
 
-  const queryEmbeddingResponse = await openai.embeddings.create({
-    model: "text-embedding-3-small",
-    input: query.content,
-    encoding_format: "float",
-  })
-  const queryEmbedding = queryEmbeddingResponse.data[0].embedding
+    const supabase = await createClient()
 
-  // ----------------------------------------------------------------------------
-  // const { data: questionEmbeddings } = await supabase
-  //   .from('questions')
-  //   .select()
-  // console.log(questionEmbeddings)
-  // const newQuestion = {
-  //   content: question,
-  //   embedding: queryEmbedding
-  // }
-  // await supabase
-  //   .from('questions')
-  //   .insert(newQuestion)
-  // ----------------------------------------------------------------------------
+    // 1. standalone question
 
-  // query in db document_sections
+    const queryEmbeddingResponse = await openai.embeddings.create({
+      model: "text-embedding-3-small",
+      input: query.content,
+      encoding_format: "float",
+    })
+    const queryEmbedding = queryEmbeddingResponse.data[0].embedding
 
-  let { data, error } = await supabase
-    .rpc('match_documents_by_topic_id', {
-      match_count: 3,
-      p_topic_id: topicId,
-      query_embedding: queryEmbedding
+    // ----------------------------------------------------------------------------
+    // const { data: questionEmbeddings } = await supabase
+    //   .from('questions')
+    //   .select()
+    // console.log(questionEmbeddings)
+    // const newQuestion = {
+    //   content: question,
+    //   embedding: queryEmbedding
+    // }
+    // await supabase
+    //   .from('questions')
+    //   .insert(newQuestion)
+    // ----------------------------------------------------------------------------
+
+    // query in db document_sections
+
+    let { data, error } = await supabase
+      .rpc('match_documents_by_topic_id', {
+        match_count: 3,
+        p_topic_id: topicId,
+        query_embedding: queryEmbedding
+      })
+
+    if (error) console.error(error)
+
+    let context = ''
+    data.map((item, index) => {
+      if (index + 1 === data.length) {
+        context += `${item.content.trim()}`
+      } else {
+        context += `${item.content.trim()}\n\n---\n\n`
+      }
     })
 
-  if (error) console.error(error)
+    const prompt = `Felhasználó aktuális kérdése/kérése: "${query.content}"
+    Kontextus:
+    ${context}`
 
-  let context = ''
-  data.map((item, index) => {
-    if (index + 1 === data.length) {
-      context += `${item.content.trim()}`
+    const systemContent = `Te egy mesterséges intelligenciával működő asszisztens vagy, amely segít a felhasználónak kérdéseket megválaszolni a megadott dokumentumrészletek és a korábbi beszélgetés alapján.
+                          Csak az itt megadott és a korábbi üzenetekben található információkat használd a pontos válasz megfogalmazásához.
+                          Ha a megadott információkból nem tudsz egyértelmű választ adni, kérlek, válaszolj a következő sablon szerint:
+                          "Sajnálom, de a rendelkezésre álló információk alapján erre a kérdésre jelenleg nem tudok válaszolni."`
+
+    let messagesForPrompt = []
+    if (prevMessages.length < 1) {
+      messagesForPrompt = [{ role: "system", content: systemContent }, { role: "user", content: prompt }]
     } else {
-      context += `${item.content.trim()}\n\n---\n\n`
+      // messagesForPrompt = [{ role: "system", content: systemContent }, { role: "user", content: prompt }]
+      messagesForPrompt = [{ role: "system", content: systemContent }, ...prevMessages, { role: "user", content: prompt }]
     }
-  })
 
-  const prompt = `Felhasználó aktuális kérdése/kérése: "${query.content}"
-  Kontextus:
-  ${context}`
+    // const enc = encodingForModel("gpt-4o-mini")
+    // console.log(enc.encode(prompt).length);
+    // console.log(enc.encode(systemContent).length);
 
-  const systemContent = `Te egy mesterséges intelligenciával működő asszisztens vagy, amely segít a felhasználónak kérdéseket megválaszolni a megadott dokumentumrészletek és a korábbi beszélgetés alapján.
-                        Csak az itt megadott és a korábbi üzenetekben található információkat használd a pontos válasz megfogalmazásához.
-                        Ha a megadott információkból nem tudsz egyértelmű választ adni, kérlek, válaszolj a következő sablon szerint:
-                        "Sajnálom, de a rendelkezésre álló információk alapján erre a kérdésre jelenleg nem tudok válaszolni."`
+    const completion = await openai.chat.completions.create({
+      messages: messagesForPrompt,
+      model: "gpt-4o-mini",
+      temperature: 0
+    })
+    const { prompt_tokens, completion_tokens, total_tokens } = completion.usage
+    const { role, content } = completion.choices[0].message
 
-  let messagesForPrompt = []
-  if (prevMessages.length < 1) {
-    messagesForPrompt = [{ role: "system", content: systemContent }, { role: "user", content: prompt }]
-  } else {
-    // messagesForPrompt = [{ role: "system", content: systemContent }, { role: "user", content: prompt }]
-    messagesForPrompt = [{ role: "system", content: systemContent }, ...prevMessages, { role: "user", content: prompt }]
+    return { message: { role, content }, tokens: { prompt_tokens, completion_tokens, total_tokens } }
+  } catch (error) {
+    return { message: error.message }
   }
-
-  // const enc = encodingForModel("gpt-4o-mini")
-  // console.log(enc.encode(prompt).length);
-  // console.log(enc.encode(systemContent).length);
-
-  const completion = await openai.chat.completions.create({
-    messages: messagesForPrompt,
-    model: "gpt-4o-mini",
-    temperature: 0
-  })
-  const { prompt_tokens, completion_tokens, total_tokens } = completion.usage
-  const { role, content } = completion.choices[0].message
-
-  return { message: { role, content }, tokens: { prompt_tokens, completion_tokens, total_tokens } }
 }
 
 

@@ -58,6 +58,11 @@ export default function ChatWindow({ topicId }) {
         completion_tokens: data.tokens.completion_tokens,
         prompt_tokens: data.tokens.prompt_tokens
       }))
+    },
+    onError: (data) => {
+      toast({
+        description: data.message,
+      });
     }
   })
 
