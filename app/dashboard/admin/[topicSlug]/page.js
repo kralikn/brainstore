@@ -1,6 +1,7 @@
 import DocsList from "@/components/docs-list";
 import FileUpload from "@/components/file-upload";
-import LoadingDocsListPage from "@/components/loading-docs-list-page";
+import LoadingDocsList from "@/components/loading-docs-list";
+import LoadingDocsListHeader from "@/components/loading-docs-list-header";
 import { getFiles } from "@/utils/actions"
 import {
   dehydrate,
@@ -11,7 +12,18 @@ import { Suspense } from "react"
 
 const queryClient = new QueryClient()
 
-async function Docs({ topicSlug }) {
+async function DocsListFunction({ topicSlug }) {
+  await queryClient.prefetchQuery({
+    queryKey: ['topic', topicSlug],
+    queryFn: () => getFiles(topicSlug),
+  });
+  return (
+    <>
+      <DocsList topicSlug={topicSlug} />
+    </>
+  )
+}
+async function FileUploadFunction({ topicSlug }) {
   await queryClient.prefetchQuery({
     queryKey: ['topic', topicSlug],
     queryFn: () => getFiles(topicSlug),
@@ -19,7 +31,6 @@ async function Docs({ topicSlug }) {
   return (
     <>
       <FileUpload topicSlug={topicSlug} />
-      <DocsList topicSlug={topicSlug} />
     </>
   )
 }
@@ -29,9 +40,14 @@ export default async function TopicPage({ params }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <Suspense fallback={<LoadingDocsListPage />}>
+      <Suspense fallback={<LoadingDocsListHeader />}>
         <HydrationBoundary state={dehydrate(queryClient)}>
-          <Docs topicSlug={topicSlug} />
+          <FileUploadFunction topicSlug={topicSlug} />
+        </HydrationBoundary>
+      </Suspense>
+      <Suspense fallback={<LoadingDocsList />}>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <DocsListFunction topicSlug={topicSlug} />
         </HydrationBoundary>
       </Suspense>
       {/* <DocsList topicSlug={topicSlug} /> */}
