@@ -403,6 +403,8 @@ export async function getFileListForChat(topicId) {
 }
 export async function generateChatResponse({ prevMessages, query, topicId }) {
 
+  await new Promise(resolve => setTimeout(resolve, 10000))
+
   try {
 
     const supabase = await createClient()
@@ -473,7 +475,7 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
       const completion = await openai.chat.completions.create({
         messages: messagesForPrompt,
         model: "gpt-4o-mini",
-        max_completion_tokens: 1500,
+        // max_completion_tokens: 1500,
         temperature: 0
       })
       const { prompt_tokens, completion_tokens, total_tokens } = completion.usage
