@@ -546,6 +546,11 @@ export async function extractBankTransactions(data) {
 
     Az eredményt strukturált JSON formátumban add vissza az alábbi minta szerint:
       {
+        "statement_data": {
+          "account": "HU93 1030 0002 1333 9078 0001 4908",
+          "currency": "HUF",
+          "statement_number": "2024/075",
+        },
         "transactions":[
           {
             "datum": "2024-09-05",
@@ -598,7 +603,7 @@ export async function extractBankTransactions(data) {
   const content = JSON.parse(cleanContent);
   const transactionsArray = content.transactions
 
-  // // const statement_data = content.statement_data
+  const statement_data = content.statement_data
   const transactions = transactionsArray.map(transaction => {
     return { ...transaction, id: uuidv4() }
   })
@@ -608,7 +613,7 @@ export async function extractBankTransactions(data) {
 
   console.log(transactions);
 
-  return transactions
+  return { statement_data, transactions }
 
   // return null;
 

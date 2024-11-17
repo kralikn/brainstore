@@ -18,16 +18,16 @@ export default function TransactionsTable({ transactions, statementData }) {
   )
   return (
     <div>
-      <Table>
+      <Table className="text-xs">
         <TableCaption>A tranzakciók listája.</TableCaption>
         <TableHeader>
           <TableRow>
-            {/* <TableHead>Kivonat száma</TableHead> */}
+            <TableHead>Kivonat száma</TableHead>
             <TableHead>Értéknap</TableHead>
-            <TableHead>Tranzakció típusa</TableHead>
             <TableHead>Megnevezés</TableHead>
             <TableHead>Partner</TableHead>
             <TableHead>Partner bankszámlaszáma</TableHead>
+            <TableHead>Megjegyzés</TableHead>
             <TableHead>Összeg</TableHead>
             {/* <TableHead>Jóváírás</TableHead> */}
             {/* <TableHead>Ellenszámlaszám</TableHead>
@@ -40,12 +40,14 @@ export default function TransactionsTable({ transactions, statementData }) {
           {
             transactions.map(transaction => {
               return (<TableRow key={transaction.id}>
+                <TableCell >{statementData.statement_number}</TableCell>
                 <TableCell >{transaction.datum}</TableCell>
-                <TableCell >{transaction.tipus}</TableCell>
                 <TableCell >{transaction.megnevezes}</TableCell>
                 <TableCell >{transaction.partner}</TableCell>
                 <TableCell >{transaction.partner_bankszamlaszama}</TableCell>
+                <TableCell >{transaction.megjegyzes}</TableCell>
                 <TableCell className="text-right">{transaction.tipus === "terhelés" ? Intl.NumberFormat("no").format(-Math.abs(transaction.osszeg)) : Intl.NumberFormat("no").format(transaction.osszeg)}</TableCell>
+                <TableCell >{statementData.currency}</TableCell>
                 {/* <TableCell className="text-right">{Intl.NumberFormat("no").format(transaction.jóváírás)}</TableCell>
                 <TableCell >{statementData.statement_number}</TableCell>
                 <TableCell >{transaction.datum}</TableCell>

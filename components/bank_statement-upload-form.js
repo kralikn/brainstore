@@ -28,9 +28,9 @@ export default function BankStatementUploadForm({ setTransactions, setStatementD
         return;
       }
       console.log(data);
-      setTransactions(data)
-      // setTransactions(data.transactions)
-      // setStatementData(data.statement_data)
+      // setTransactions(data)
+      setTransactions(data.transactions)
+      setStatementData(data.statement_data)
       toast({ description: "A tranzakciókat sikerült kinyerni." })
       reset()
     },
