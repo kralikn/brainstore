@@ -47,7 +47,7 @@ export default function TransactionsTable({ transactions, statementData }) {
                 <TableCell >{transaction.partner_bankszamlaszama}</TableCell>
                 <TableCell >{transaction.megjegyzes}</TableCell>
                 <TableCell className="text-right">{transaction.tipus === "terhelés" ? Intl.NumberFormat("no").format(-Math.abs(transaction.osszeg)) : Intl.NumberFormat("no").format(transaction.osszeg)}</TableCell>
-                <TableCell >{statementData.currency}</TableCell>
+                {/* <TableCell >{statementData.currency}</TableCell> */}
                 {/* <TableCell className="text-right">{Intl.NumberFormat("no").format(transaction.jóváírás)}</TableCell>
                 <TableCell >{statementData.statement_number}</TableCell>
                 <TableCell >{transaction.datum}</TableCell>
