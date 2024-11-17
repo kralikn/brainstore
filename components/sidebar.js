@@ -14,8 +14,8 @@ export default function Sidebar() {
   return (
     <div className="h-full bg-gray-50">
       <CardTitle className="h-20 flex flex-row justify-center items-center gap-1 text-4xl">
-        <span>brAInst</span>
-        <span className="-ml-0.5 -mr-1 mt-0.25"><Brain size={28} /></span>
+        <span>brainst</span>
+        <span className="-ml-0.5 -mr-1 mt-0.25 animate-pulse"><Brain size={28} /></span>
         <span>re</span>
       </CardTitle>
 

@@ -19,5 +19,5 @@ function validateFile() {
   const acceptedFileTypes = ['application/pdf']
   return z.instanceof(File).refine((file) => {
     return !file || acceptedFileTypes.some((type) => file.type.startsWith(type))
-  }, 'Csk pdf tölthető fel!')
+  }, 'Csak pdf tölthető fel!')
 }

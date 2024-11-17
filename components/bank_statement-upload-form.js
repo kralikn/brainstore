@@ -5,19 +5,20 @@ import { useForm } from 'react-hook-form'
 import { useToast } from "@/hooks/use-toast"
 import { Input } from './ui/input'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { uploadFile } from '@/utils/actions'
+import { extractBankTransactions } from '@/utils/actions'
 import { CloudUpload, Loader2 } from 'lucide-react'
 
 
-export default function FileUploadForm({ topicSlug }) {
+export default function BankStatementUploadForm({ setTransactions, setStatementData }) {
 
   const { toast } = useToast()
 
   const { register, handleSubmit, reset } = useForm()
 
   const queryClient = useQueryClient();
+
   const { mutate, isPending } = useMutation({
-    mutationFn: (formData) => uploadFile(formData),
+    mutationFn: (formData) => extractBankTransactions(formData),
     onSuccess: (data) => {
       if (!data) {
         toast({
@@ -26,36 +27,39 @@ export default function FileUploadForm({ topicSlug }) {
         });
         return;
       }
-      toast({ description: data.message })
+      console.log(data);
+      setTransactions(data)
+      // setTransactions(data.transactions)
+      // setStatementData(data.statement_data)
+      toast({ description: "A tranzakciókat sikerült kinyerni." })
       reset()
-      queryClient.invalidateQueries({ queryKey: ['topic', topicSlug] })
     },
   });
 
   const onSubmit = (data) => {
 
-    if (!data.topic_file[0]) {
+    if (!data.bank_statement[0]) {
       toast({
-        description: 'Kérjük, válasszon egy fájlt!',
+        description: 'Kérlek válassz egy fájlt!',
       });
       return;
     }
 
     const formData = new FormData();
-    formData.append('topic_file', data.topic_file[0]); // Fájl hozzáadása a formData-hoz
-    mutate({ formData, topicSlug });
+    formData.append('bank_statement', data.bank_statement[0])
+    mutate({ formData });
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4">
       <Input
         type="file"
-        id="topic_file"
-        name="topic_file"
+        id="bank_statement"
+        name="bank_statement"
         placeholder="Fájl kiválasztása..."
         required
         accept="application/pdf"
-        {...register("topic_file")}
+        {...register("bank_statement")}
       />
       <Button type="submit" disabled={isPending}>
         {isPending ? <Loader2 className="animate-spin" /> : <CloudUpload />} Feltöltés

@@ -7,6 +7,10 @@ import { v4 as uuidv4 } from 'uuid'
 import PdfParse from 'pdf-parse/lib/pdf-parse'
 import OpenAI from 'openai'
 // import { encodingForModel } from "js-tiktoken";
+// import { getDocument } from "pdfjs-dist";
+// import { PDFDocument, rgb } from "pdf-lib"
+
+import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
 
 const openAIApiKey = process.env.OPEN_AI_KEY
 const openai = new OpenAI({
@@ -196,10 +200,11 @@ export async function uploadFile(data) {
 
   const { formData, topicSlug } = data
 
-  // console.log(data);
-
   const file = formData.get('topic_file')
   const result = fileSchema.safeParse({ file })
+
+  const pdfData = await file.arrayBuffer()
+  const docContent = await PdfParse(pdfData)
 
   if (!result.success) {
     const errors = result.error.errors.map((error) => error.message);
@@ -403,7 +408,7 @@ export async function getFileListForChat(topicId) {
 }
 export async function generateChatResponse({ prevMessages, query, topicId }) {
 
-  await new Promise(resolve => setTimeout(resolve, 10000))
+  // await new Promise(resolve => setTimeout(resolve, 10000))
 
   try {
 
@@ -491,6 +496,122 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
     console.error("Általános hiba:", error);
     return { message: "Általános hiba történt a függvény futtatása közben." };
   }
+}
+export async function extractBankTransactions(data) {
+
+  const { formData } = data
+
+  const file = formData.get('bank_statement')
+  const result = fileSchema.safeParse({ file })
+  if (!result.success) {
+    const errors = result.error.errors.map((error) => error.message);
+    throw new Error(errors.join(','));
+  }
+  const pdfData = await file.arrayBuffer()
+  const docContent = await PdfParse(pdfData)
+
+  // console.log(docContent);
+  // console.log(docContent.text);
+
+  // const docContentArray = docContent.text.split('\n')
+  // const cleanedDocContent = docContentArray.map(row => {
+  //   return row.replace(/(\d)\s+(\d)/g, '$1$2')
+  //   // .replace(/(\d)\s+\./g, '$1.')
+  //   // .replace(/([a-zA-Z])\s+(\d)/g, '$1 $2')
+  // }).join('\n')
+
+  // console.log(docContent.text.split('\n'))
+  // "statement_data": {
+  //   "account": "HU93 1030 0002 1333 9078 0001 4908",
+  //     "currency": "HUF",
+  //       "statement_number": "2024/075",
+  //         "opening_balance": 21410283,
+  //           "closing_balance": 27022350
+  // },
+  // 4. Ne használj kódblokkokat(\`\`\`), csak tiszta JSON-t adj vissza.
+
+
+  // // const systemContent = `Te egy mesterséges intelligenciával működő asszisztens vagy, amely segít a bankszámlakivonatokról a tranzakciókat kigyűjteni dátum, tranzakció típusa, tranzakció megnevezése, kedvezményezett neve, bankszámlaszáma, megjegyzés és összeg alapján.`;
+
+  const systemContent = `Te egy mesterséges intelligenciával működő asszisztens vagy, amely segít bankszámlakivonatokból a tranzakciós adatokat kinyerni és azokat strukturált formában (Értéknap, Tranzakció típusa, Tranzakció megnevezése, Partner neve, Partner bankszámlaszáma, Megjegyzés, Összeg) megadni.`;
+
+  const prompt = `Kérlek, gyűjtsd ki a bankszámlakivonaton szereplő összes tranzakció részleteit az alábbi mezők szerint:
+    - Értéknap (ISO 8601 dátum, pl. "2024-09-05")
+    - Tranzakció típusa ("terhelés", "jóváírás")
+    - Tranzakció megnevezése
+    - Partner neve
+    - Partner bankszámlaszáma
+    - Megjegyzés
+    - Összeg
+
+    Az eredményt strukturált JSON formátumban add vissza az alábbi minta szerint:
+      {
+        "transactions":[
+          {
+            "datum": "2024-09-05",
+            "tipus": "terhelés",
+            "megnevezes": "GIRO átutalás jóváírása",
+            "partner": "FAKÉP BT",
+            "partner_bankszamlaszama": "HU07117050082042865900000000",
+            "megjegyzes": "E-Trium-2024-247",
+            "osszeg": 130510
+          },
+          {
+            "datum": "2024-09-05",
+            "tipus": "jóváírás",
+            "megnevezes": "Toke elszámolása",
+            "partner": "GEO-LOG KÖRNYEZETVÉD. ÉS GEOFIZ.KFT",
+            "partner_bankszamlaszama": "HU73117140062024733900000000",
+            "megjegyzes": "E-TRIUM-2024-203 szla",
+            "osszeg": 327919
+          }
+        ] 
+      }
+
+    Fontos megjegyzések:
+    1. Ha egy tranzakcióhoz tartozó adat hiányzik, az adott mezőt hagyd üresen ("").
+    2. Az eredmény tartalmazza a bankszámlakivonat összes tranzakcióját a bankszámlakivonaton szereplő sorrendben.
+    3. Az adatokat pontosan a megadott mezőnevekkel és formátumban add meg.
+    4. Ne használj kódblokkokat(\`\`\`), csak tiszta JSON-t adj vissza.
+
+    A bankszámlakivonat szöveges tartalma a következő:
+
+    ${docContent.text}
+  `
+
+  const messagesForPrompt = [{ role: "system", content: systemContent }, { role: "user", content: prompt }]
+
+  const completion = await openai.chat.completions.create({
+    messages: messagesForPrompt,
+    // model: "gpt-4o-mini",
+    model: "chatgpt-4o-latest",
+    // max_completion_tokens: 1500,
+    temperature: 0
+  })
+
+  console.log(completion.choices[0].message)
+  // // console.log(completion.choices[0].message.content)
+
+  // // const content = JSON.parse(completion.choices[0].message.content)
+  const rawContent = completion.choices[0].message.content.trim()
+  const cleanContent = rawContent.replace(/```json|```/g, ''); // Kódblokkok eltávolítása
+  const content = JSON.parse(cleanContent);
+  const transactionsArray = content.transactions
+
+  // // const statement_data = content.statement_data
+  const transactions = transactionsArray.map(transaction => {
+    return { ...transaction, id: uuidv4() }
+  })
+  // const transactions = content.map(transaction => {
+  //   return { ...transaction, id: uuidv4() }
+  // })
+
+  console.log(transactions);
+
+  return transactions
+
+  // return null;
+
 }
 
 
