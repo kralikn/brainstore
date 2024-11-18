@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import PdfParse from 'pdf-parse/lib/pdf-parse'
 import OpenAI from 'openai'
+import * as XLSX from 'xlsx'
 // import { encodingForModel } from "js-tiktoken";
 // import { getDocument } from "pdfjs-dist";
 // import { PDFDocument, rgb } from "pdf-lib"
@@ -510,9 +511,6 @@ export async function extractBankTransactions(data) {
   const pdfData = await file.arrayBuffer()
   const docContent = await PdfParse(pdfData)
 
-  // console.log(docContent);
-  // console.log(docContent.text);
-
   // const docContentArray = docContent.text.split('\n')
   // const cleanedDocContent = docContentArray.map(row => {
   //   return row.replace(/(\d)\s+(\d)/g, '$1$2')
@@ -520,13 +518,12 @@ export async function extractBankTransactions(data) {
   //   // .replace(/([a-zA-Z])\s+(\d)/g, '$1 $2')
   // }).join('\n')
 
-  // console.log(docContent.text.split('\n'))
   // "statement_data": {
   //   "account": "HU93 1030 0002 1333 9078 0001 4908",
-  //     "currency": "HUF",
-  //       "statement_number": "2024/075",
-  //         "opening_balance": 21410283,
-  //           "closing_balance": 27022350
+  //   "currency": "HUF",
+  //   "statement_number": "2024/075",
+  //   "opening_balance": 21410283,
+  //   "closing_balance": 27022350
   // },
   // 4. Ne használj kódblokkokat(\`\`\`), csak tiszta JSON-t adj vissza.
 
@@ -611,13 +608,35 @@ export async function extractBankTransactions(data) {
   //   return { ...transaction, id: uuidv4() }
   // })
 
-  console.log(transactions);
-
   return { statement_data, transactions }
 
-  // return null;
-
 }
+// export async function exportTransactionsTable(transactions) {
+
+//   console.log(transactions);
+
+//   try {
+
+//     const worksheet = XLSX.utils.json_to_sheet(transactions)
+
+//     const csv = XLSX.utils.sheet_to_csv(worksheet, {
+//       forceQuotes: true
+//     })
+
+//     const filename = "teszt"
+
+//     return new Response(csv, {
+//       status: 200,
+//       headers: {
+//         'Content-Disposition': `attachment; filename="${filename}.csv"`,
+//         'Content-Type': 'text/csv'
+//       }
+//     })
+//   } catch (error) {
+//     console.log(error);
+//   }
+
+// }
 
 
 

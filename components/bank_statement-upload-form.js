@@ -27,7 +27,6 @@ export default function BankStatementUploadForm({ setTransactions, setStatementD
         });
         return;
       }
-      console.log(data);
       // setTransactions(data)
       setTransactions(data.transactions)
       setStatementData(data.statement_data)
@@ -51,7 +50,7 @@ export default function BankStatementUploadForm({ setTransactions, setStatementD
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4 m-0 p-0">
       <Input
         type="file"
         id="bank_statement"
