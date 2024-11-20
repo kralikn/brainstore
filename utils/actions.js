@@ -506,7 +506,7 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
     try {
       const completion = await openai.chat.completions.create({
         messages: messagesForPrompt,
-        model: "gpt-4o",
+        model: "gpt-4o-latest",
         // max_completion_tokens: 1500,
         temperature: 0
       })
