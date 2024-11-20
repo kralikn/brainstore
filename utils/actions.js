@@ -104,6 +104,15 @@ export async function deleteTopic(topic) {
         .remove(pathArray)
     }
 
+    const response = await supabase
+      .from('notes')
+      .delete()
+      .in('topic_id', id)
+
+    if (response.error) {
+      console.log(response.error)
+      return null
+    }
     const { error } = await supabase
       .from('topics')
       .delete()
@@ -157,7 +166,8 @@ export async function getAllTopics() {
       }
     })
 
-    console.log(mergedData);
+    console.log("groupByData: ", groupByData);
+    console.log("mergedData: ", mergedData);
     return mergedData
   } catch (error) {
     console.log(error)
