@@ -81,7 +81,7 @@ export default function ChatWindow({ topicId }) {
         <CardDescription className="text-xs">{`completion tokes: ${tokens.completion_tokens}`}</CardDescription>
         <CardDescription className="text-xs">{`total tokes: ${tokens.total_tokens}`}</CardDescription>
       </div>
-      <div className="w-3/4">
+      <div className="w-full">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex gap-2">
             <FormField
