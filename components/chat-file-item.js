@@ -8,7 +8,7 @@ export default function ChatFileItem({ doc }) {
   return (
     <div className="flex justify-between items-start gap-2">
       <div className="flex gap-3 items-center">
-        <File />
+        <File size={18} />
         <div className="">{fileName}</div>
       </div>
       <SignedUrl signedUrl={doc.signedUrl} />

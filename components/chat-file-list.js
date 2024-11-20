@@ -34,18 +34,22 @@ export default function ChatFileList({ topicId }) {
           <CardDescription>{`${notesCount} jegyzet`}</CardDescription>
         </div>
       </CardHeader>
-      <Separator className="mb-6" />
-      <CardContent className="space-y-6">
-        {docs.map(doc => {
-          return <ChatFileItem key={doc.id} doc={doc} />
-        })}
-      </CardContent>
-      <Separator className="mb-6" />
-      <CardContent className="space-y-6">
-        {notes.map(note => {
-          return <ChatNoteItem key={note.id} note={note} />
-        })}
-      </CardContent>
+      {(docs.length > 0) && <>
+        <Separator className="mb-4" />
+        <CardContent className="space-y-4 text-xs">
+          {docs.map(doc => {
+            return <ChatFileItem key={doc.id} doc={doc} />
+          })}
+        </CardContent>
+      </>}
+      {(notes.length > 0) && <>
+        <Separator className="mb-4" />
+        <CardContent className="space-y-4 text-xs">
+          {notes.map(note => {
+            return <ChatNoteItem key={note.id} note={note} />
+          })}
+        </CardContent>
+      </>}
     </Card>
   )
 }

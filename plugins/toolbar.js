@@ -131,6 +131,7 @@ export default function ToolbarPlugin() {
       <div className=''>
         <Button
           variant="outline"
+          size='sm'
           value="undo"
           disabled={!canUndo}
           onClick={() => { editor.dispatchCommand(UNDO_COMMAND, undefined) }}
@@ -139,6 +140,7 @@ export default function ToolbarPlugin() {
         </Button>
         <Button
           variant="outline"
+          size='sm'
           value="redo"
           disabled={!canRedo}
           onClick={() => { editor.dispatchCommand(REDO_COMMAND, undefined) }}
@@ -150,6 +152,7 @@ export default function ToolbarPlugin() {
       <div className=' '>
         <Button
           variant="outline"
+          size='sm'
           value="h1"
           onClick={() => editor.update(() => toggleBlock('h1'))}
         >
@@ -157,6 +160,7 @@ export default function ToolbarPlugin() {
         </Button >
         <Button
           variant="outline"
+          size='sm'
           onClick={() => editor.update(() => toggleBlock('h2'))}
           value="h2"
         >
@@ -164,6 +168,7 @@ export default function ToolbarPlugin() {
         </Button >
         <Button
           variant="outline"
+          size='sm'
           onClick={() => editor.update(() => toggleBlock('h3'))}
           value="h3"
         >
@@ -174,6 +179,7 @@ export default function ToolbarPlugin() {
       <div className=' '>
         <Button
           variant="outline"
+          size='sm'
           value="bold"
           onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold') }}
         >
@@ -181,6 +187,7 @@ export default function ToolbarPlugin() {
         </Button >
         <Button
           variant="outline"
+          size='sm'
           value="italic"
           onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic') }}
 
@@ -189,6 +196,7 @@ export default function ToolbarPlugin() {
         </Button >
         <Button
           variant="outline"
+          size='sm'
           value="underline"
           onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline'); }}
         >
@@ -196,6 +204,7 @@ export default function ToolbarPlugin() {
         </Button >
         <Button
           variant="outline"
+          size='sm'
           value="strikethrough"
           onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough') }}
         >
@@ -206,6 +215,7 @@ export default function ToolbarPlugin() {
       <div className=' '>
         <Button
           variant="outline"
+          size='sm'
           value="left"
           onClick={() => { editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left') }}
         >
@@ -213,6 +223,7 @@ export default function ToolbarPlugin() {
         </Button >
         <Button
           variant="outline"
+          size='sm'
           value="center"
           onClick={() => { editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center') }}
         >
@@ -220,6 +231,7 @@ export default function ToolbarPlugin() {
         </Button >
         <Button
           variant="outline"
+          size='sm'
           value="right"
           onClick={() => { editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right') }}
         >
@@ -227,6 +239,7 @@ export default function ToolbarPlugin() {
         </Button >
         <Button
           variant="outline"
+          size='sm'
           value="justify"
           onClick={() => { editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify') }}
         >

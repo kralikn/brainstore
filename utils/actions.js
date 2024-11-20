@@ -104,15 +104,18 @@ export async function deleteTopic(topic) {
         .remove(pathArray)
     }
 
-    const response = await supabase
+    const { data: deletedNotes, error: deletedNotesError } = await supabase
       .from('notes')
       .delete()
-      .in('topic_id', id)
+      .eq('topic_id', id)
 
-    if (response.error) {
-      console.log(response.error)
+    console.log(id);
+
+    if (deletedNotesError) {
+      console.log("deletedNotesError: ", deletedNotesError)
       return null
     }
+
     const { error } = await supabase
       .from('topics')
       .delete()
@@ -132,7 +135,6 @@ export async function deleteTopic(topic) {
 }
 export async function getAllTopics() {
 
-  // await new Promise(resolve => setTimeout(resolve, 2000))
 
   try {
     const supabase = await createClient()
@@ -144,10 +146,6 @@ export async function getAllTopics() {
       console.log(error)
       return null
     }
-
-    // const { data: groupByData, error: groupByError } = await supabase
-    //   .rpc('count_documents_by_topic')
-
 
     let { data: groupByData, error: groupByError } = await supabase
       .rpc('count_documents_and_notes_by_topic')
@@ -166,8 +164,6 @@ export async function getAllTopics() {
       }
     })
 
-    console.log("groupByData: ", groupByData);
-    console.log("mergedData: ", mergedData);
     return mergedData
   } catch (error) {
     console.log(error)
