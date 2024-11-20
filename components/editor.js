@@ -11,6 +11,8 @@ import { $createHeadingNode, HeadingNode } from '@lexical/rich-text';
 import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import ToolbarPlugin from '@/plugins/toolbar';
+import { createContext } from '@/utils/actions';
+import { Input } from './ui/input';
 
 const theme = {
   heading: {
@@ -18,9 +20,12 @@ const theme = {
     h2: 'text-3xl',
     h3: 'text-2xl'
   },
-  // text: {
-  //   bold: 'text-3xl'
-  // }
+  text: {
+    bold: 'font-bold',
+    italic: 'italic',
+    strikethrough: 'line-through',
+    underline: 'underline',
+  },
 }
 
 function onError(error) {
@@ -59,20 +64,24 @@ function MyHeadingPlugin() {
 
   return <Button onClick={onClick} >Heading</Button>
 }
-function SaveButton() {
-  const [editor] = useLexicalComposerContext();
-  const handleSave = async () => {
-    editor.update(() => {
-      const editorState = editor.getEditorState()
-      const json = editorState.toJSON()
-      console.log(JSON.stringify(json));
-    })
+export default function Editor({ topicSlug }) {
+
+  function SaveButton() {
+    const [editor] = useLexicalComposerContext();
+    const handleSave = async () => {
+      editor.update(async () => {
+        const editorState = editor.getEditorState()
+        const json = editorState.toJSON()
+        console.log(JSON.stringify(json));
+        const editorJSON = JSON.stringify(json)
+        await createContext({ editorJSON, noteTitle, topicSlug })
+      })
+    }
+
+    return <Button className='mt-4' onClick={handleSave}>Mentés</Button>
   }
 
-  return <Button className='mt-4' onClick={handleSave} >Mentés</Button>
-}
-export default function Editor() {
-
+  const [noteTitle, setNoteTitle] = useState('');
   const [editorState, setEditorState] = useState();
   function onChange(editorState) {
     // Call toJSON on the EditorState object, which produces a serialization safe string
@@ -83,15 +92,22 @@ export default function Editor() {
 
 
   return (
-    <div className='flex flex-col items-start gap-2'>
-      <div className='relative'>
+    <div className='flex flex-col items-start gap-2 w-2/4'>
+      <div className='w-full mb-2'>
+        <Input
+          value={noteTitle}
+          onChange={(e) => setNoteTitle(e.target.value)}
+          placeholder="A jegyzeted címe..."
+        />
+      </div>
+      <div className='relative w-full h-full'>
         <LexicalComposer initialConfig={initialConfig}>
           {/* <MyHeadingPlugin /> */}
           <div className='mb-2'>
             <ToolbarPlugin />
           </div>
           <RichTextPlugin
-            contentEditable={<ContentEditable className='w-full min-h-[calc(100vh-23.75rem)] border rounded-md p-4' />}
+            contentEditable={<ContentEditable className='w-full min-h-[calc(100vh-28rem)] max-h-[calc(100vh-23.75rem)] overflow-y-auto border rounded-md p-4' />}
             // placeholder={<div className='absolute top-14 left-4 text-gray-400'>Írj valami okosat0...</div>}
             ErrorBoundary={LexicalErrorBoundary}
           />

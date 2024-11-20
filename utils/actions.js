@@ -136,25 +136,28 @@ export async function getAllTopics() {
       return null
     }
 
-    const { data: groupByData, error: groupByError } = await supabase
-      .rpc('count_documents_by_topic')
+    // const { data: groupByData, error: groupByError } = await supabase
+    //   .rpc('count_documents_by_topic')
 
-    // console.log(groupByData);
+
+    let { data: groupByData, error: groupByError } = await supabase
+      .rpc('count_documents_and_notes_by_topic')
+
 
     if (groupByError) {
       console.log(groupByError)
       return null
     }
-
     const mergedData = data.map(row => {
       const matchingData = groupByData.find(g_row => g_row.topic_id === row.id);
       if (matchingData) {
-        return { ...row, doc_count: matchingData.doc_count, has_embedded: matchingData.has_embedded }
+        return { ...row, doc_count: matchingData.doc_count, has_doc_embedded: matchingData.has_doc_embedded, note_count: matchingData.note_count, has_note_embedded: matchingData.has_note_embedded }
       } else {
         return row
       }
     })
 
+    console.log(mergedData);
     return mergedData
   } catch (error) {
     console.log(error)
@@ -373,7 +376,7 @@ export async function createEmbeddings(doc) {
   return { message: "A dokumentum feldolgozva" }
 
 }
-export async function getFileListForChat(topicId) {
+export async function getSouerceForChat(topicId) {
   // console.log("topicId on server: ", topicId);
   try {
     const supabase = await createClient()
@@ -385,6 +388,16 @@ export async function getFileListForChat(topicId) {
 
     if (documentsError) {
       console.log(documentsError)
+      return null
+    }
+    const { count: notesCount, data: notesData, error: notesError } = await supabase
+      .from('notes')
+      .select('*', { count: 'exact' })
+      .eq('topic_id', topicId)
+      .eq('embedded', true)
+
+    if (notesError) {
+      console.log(notesError)
       return null
     }
 
@@ -406,7 +419,7 @@ export async function getFileListForChat(topicId) {
       })
     )
 
-    return { docsCount: count, topicTitle: topicData[0].title, docs: docsWithSignedUrl }
+    return { docsCount: count, notesCount: notesCount, topicTitle: topicData[0].title, docs: docsWithSignedUrl, notes: notesData }
 
   } catch (error) {
     console.log(error)
@@ -504,6 +517,49 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
     console.error("Általános hiba:", error);
     return { message: "Általános hiba történt a függvény futtatása közben." };
   }
+}
+export async function createContext({ editorJSON, noteTitle, topicSlug }) {
+
+  let noteContent = ''
+  const title = noteTitle
+  const noteJSON = editorJSON
+  // console.log(data);
+  // console.log(JSON.parse(data).root.children);
+  const rows = JSON.parse(noteJSON).root.children
+  // console.log(JSON.parse(data).root.children[0]);
+  rows.map(rowObject => {
+    console.log(rowObject);
+    if (rowObject.children.length !== 0) {
+      const text = rowObject.children[0].text
+      noteContent = noteContent + '\n' + text
+    } else {
+      noteContent = noteContent + '\n'
+    }
+  })
+
+  const supabase = await createClient()
+  const { data: topicData, error: topicError } = await supabase
+    .from('topics')
+    .select()
+    .eq('folder_name', topicSlug)
+
+  if (topicError) {
+    console.log(topicError)
+    return null
+  }
+
+  const topic_id = topicData[0].id
+
+  const { error } = await supabase
+    .from('notes')
+    .insert({ topic_id, content: noteContent, editor_json: noteJSON, title })
+
+  if (error) {
+    console.log(error)
+    return null
+  }
+
+  return null
 }
 // export async function extractBankTransactions(data) {
 
@@ -614,7 +670,7 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
 //             "jogcim": "betét",
 //             "osszeg": 327919
 //           }
-//         ] 
+//         ]
 //       }
 
 //     Fontos megjegyzések:
@@ -668,40 +724,40 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
 //   // return null
 
 // }
-export async function getFileFromWeb({ formData }) {
+// export async function getFileFromWeb({ formData }) {
 
-  // const file = formData.get('bank_statement')
-  // const pdfData = await file.arrayBuffer()
-  // const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise
-  // const pageCount = pdfDoc.numPages
-  // console.log(pageCount)
+//   // const file = formData.get('bank_statement')
+//   // const pdfData = await file.arrayBuffer()
+//   // const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise
+//   // const pageCount = pdfDoc.numPages
+//   // console.log(pageCount)
 
-  // const agent = new https.Agent({
-  //   rejectUnauthorized: false
-  // })
-  // console.log("on sever")
-  // const url = 'https://nav.gov.hu/pfile/file?path=/ugyfeliranytu/nezzen-utana/inf_fuz/informacios-fuzetek---2024/18.-informacios-fuzet---A-szamla-nyugta-kibocsatasanak-alapveto-szabalyai'
-  // const { data } = await axios.get(url, { responseType: 'arraybuffer', httpsAgent: agent })
-  // const pdfData = new Uint8Array(data);
-  // const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise
-  // const pageCount = pdfDoc.numPages
-  // console.log(pageCount)
+//   // const agent = new https.Agent({
+//   //   rejectUnauthorized: false
+//   // })
+//   // console.log("on sever")
+//   // const url = 'https://nav.gov.hu/pfile/file?path=/ugyfeliranytu/nezzen-utana/inf_fuz/informacios-fuzetek---2024/18.-informacios-fuzet---A-szamla-nyugta-kibocsatasanak-alapveto-szabalyai'
+//   // const { data } = await axios.get(url, { responseType: 'arraybuffer', httpsAgent: agent })
+//   // const pdfData = new Uint8Array(data);
+//   // const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise
+//   // const pageCount = pdfDoc.numPages
+//   // console.log(pageCount)
 
-  // const page = await pdfDoc.getPage(4)
-  // const textContent = await page.getTextContent()
+//   // const page = await pdfDoc.getPage(4)
+//   // const textContent = await page.getTextContent()
 
-  // const extractedTexts = []
-  // textContent.items.map(item => {
-  //   // console.log(item)
-  //   extractedTexts.push(item.str)
-  // })
+//   // const extractedTexts = []
+//   // textContent.items.map(item => {
+//   //   // console.log(item)
+//   //   extractedTexts.push(item.str)
+//   // })
 
-  // // // console.log(extractedTexts)
-  // // const doc = await PdfParse(data)
-  // // console.log(doc);
+//   // // // console.log(extractedTexts)
+//   // // const doc = await PdfParse(data)
+//   // // console.log(doc);
 
-  // return extractedTexts
-}
+//   // return extractedTexts
+// }
 
 
 

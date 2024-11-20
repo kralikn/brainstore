@@ -42,9 +42,9 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const LowPriority = 1;
 
-function Divider() {
-  return <Separator orientation="vertical mx-2" />
-}
+// function Divider() {
+//   return <Separator orientation="vertical mx-2" />
+// }
 
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -127,101 +127,112 @@ export default function ToolbarPlugin() {
   }
 
   return (
-    <div className="flex flex-row gap-4" ref={toolbarRef}>
-      <ToggleGroup type="multiple" variant="outline">
-        <ToggleGroupItem
+    <div className="flex flex-row justify-between" ref={toolbarRef}>
+      <div className=''>
+        <Button
+          variant="outline"
           value="undo"
           disabled={!canUndo}
           onClick={() => { editor.dispatchCommand(UNDO_COMMAND, undefined) }}
         >
           <RotateCcw className="h-4 w-4" />
-        </ToggleGroupItem>
-        <ToggleGroupItem
+        </Button>
+        <Button
+          variant="outline"
           value="redo"
           disabled={!canRedo}
           onClick={() => { editor.dispatchCommand(REDO_COMMAND, undefined) }}
         >
           <RotateCw className="h-4 w-4" />
-        </ToggleGroupItem>
-      </ToggleGroup>
+        </Button>
+      </div>
 
-      <ToggleGroup type="multiple" variant="outline">
-        <ToggleGroupItem
+      <div className=' '>
+        <Button
+          variant="outline"
           value="h1"
           onClick={() => editor.update(() => toggleBlock('h1'))}
         >
           <Heading1 className="h-4 w-4" />
-        </ToggleGroupItem >
-        <ToggleGroupItem
+        </Button >
+        <Button
+          variant="outline"
           onClick={() => editor.update(() => toggleBlock('h2'))}
           value="h2"
         >
           <Heading2 className="h-4 w-4" />
-        </ToggleGroupItem >
-        <ToggleGroupItem
+        </Button >
+        <Button
+          variant="outline"
           onClick={() => editor.update(() => toggleBlock('h3'))}
           value="h3"
         >
           <Heading3 className="h-4 w-4" />
-        </ToggleGroupItem >
-      </ToggleGroup>
+        </Button >
+      </div>
 
-      <ToggleGroup type="multiple" variant="outline">
-        <ToggleGroupItem
+      <div className=' '>
+        <Button
+          variant="outline"
           value="bold"
           onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold') }}
         >
           <Bold className="h-4 w-4" />
-        </ToggleGroupItem >
-        <ToggleGroupItem
+        </Button >
+        <Button
+          variant="outline"
           value="italic"
           onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic') }}
 
         >
           <Italic className="h-4 w-4" />
-        </ToggleGroupItem >
-        {/* <ToggleGroupItem
+        </Button >
+        <Button
+          variant="outline"
           value="underline"
           onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline'); }}
         >
           <Underline className="h-4 w-4" />
-        </ToggleGroupItem >
-        <ToggleGroupItem
+        </Button >
+        <Button
+          variant="outline"
           value="strikethrough"
           onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough') }}
         >
           <Strikethrough className="h-4 w-4" />
-        </ToggleGroupItem > */}
-      </ToggleGroup>
-      <ToggleGroup type="multiple" variant="outline">
-        <ToggleGroupItem
+        </Button >
+      </div>
+
+      <div className=' '>
+        <Button
+          variant="outline"
           value="left"
           onClick={() => { editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left') }}
-
         >
           <AlignLeft className="h-4 w-4" />
-        </ToggleGroupItem >
-        <ToggleGroupItem
+        </Button >
+        <Button
+          variant="outline"
           value="center"
           onClick={() => { editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center') }}
-
-
         >
           <AlignCenter className="h-4 w-4" />
-        </ToggleGroupItem >
-        <ToggleGroupItem
+        </Button >
+        <Button
+          variant="outline"
           value="right"
           onClick={() => { editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right') }}
         >
           <AlignRight className="h-4 w-4" />
-        </ToggleGroupItem >
-        {/* <ToggleGroupItem
+        </Button >
+        <Button
+          variant="outline"
           value="justify"
           onClick={() => { editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify') }}
         >
           <AlignJustify className="h-4 w-4" />
-        </ToggleGroupItem > */}
-      </ToggleGroup>
+        </Button >
+      </div>
     </div>
   );
 }
