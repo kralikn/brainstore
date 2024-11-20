@@ -1,4 +1,4 @@
-import { SearchCode, Users, LayoutDashboard, FolderPlus, Monitor } from 'lucide-react';
+import { SearchCode, Users, LayoutDashboard, FolderPlus, Monitor, StickyNote } from 'lucide-react';
 
 const links = [
   // {
@@ -13,7 +13,7 @@ const links = [
   // },
   {
     href: '/dashboard/admin',
-    label: 'témakör létrehozás',
+    label: 'témakörök',
     icon: <FolderPlus />,
   },
   // {
@@ -21,6 +21,11 @@ const links = [
   //   label: 'felhasználók',
   //   icon: <Users />,
   // },
+  {
+    href: '/dashboard/admin/editor',
+    label: 'Jegyzetek',
+    icon: <StickyNote />,
+  },
   {
     href: '/dashboard/admin/demo',
     label: 'demó',

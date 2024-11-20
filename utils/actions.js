@@ -7,11 +7,18 @@ import { v4 as uuidv4 } from 'uuid'
 import PdfParse from 'pdf-parse/lib/pdf-parse'
 import OpenAI from 'openai'
 import * as XLSX from 'xlsx'
+// import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
+
+// pdfjsLib.GlobalWorkerOptions.workerSrc = '../../node_modules/pdfjs-dist/build/pdf.worker.mjs';
+// await import('pdfjs-dist/build/pdf.worker.min.mjs');
 // import { encodingForModel } from "js-tiktoken";
-// import { getDocument } from "pdfjs-dist";
-// import { PDFDocument, rgb } from "pdf-lib"
+
+// pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
 import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
+import axios from "axios"
+import https from 'https'
+
 
 const openAIApiKey = process.env.OPEN_AI_KEY
 const openai = new OpenAI({
@@ -498,145 +505,203 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
     return { message: "Általános hiba történt a függvény futtatása közben." };
   }
 }
-export async function extractBankTransactions(data) {
+// export async function extractBankTransactions(data) {
 
-  const { formData } = data
+//   const { formData } = data
 
-  const file = formData.get('bank_statement')
-  const result = fileSchema.safeParse({ file })
-  if (!result.success) {
-    const errors = result.error.errors.map((error) => error.message);
-    throw new Error(errors.join(','));
-  }
-  const pdfData = await file.arrayBuffer()
-  const docContent = await PdfParse(pdfData)
-
-  // const docContentArray = docContent.text.split('\n')
-  // const cleanedDocContent = docContentArray.map(row => {
-  //   return row.replace(/(\d)\s+(\d)/g, '$1$2')
-  //   // .replace(/(\d)\s+\./g, '$1.')
-  //   // .replace(/([a-zA-Z])\s+(\d)/g, '$1 $2')
-  // }).join('\n')
-
-  // "statement_data": {
-  //   "account": "HU93 1030 0002 1333 9078 0001 4908",
-  //   "currency": "HUF",
-  //   "statement_number": "2024/075",
-  //   "opening_balance": 21410283,
-  //   "closing_balance": 27022350
-  // },
-  // 4. Ne használj kódblokkokat(\`\`\`), csak tiszta JSON-t adj vissza.
+//   const file = formData.get('bank_statement')
+//   const result = fileSchema.safeParse({ file })
+//   if (!result.success) {
+//     const errors = result.error.errors.map((error) => error.message);
+//     throw new Error(errors.join(','));
+//   }
+//   const pdfData = await file.arrayBuffer()
+//   // const docContent = await PdfParse(pdfData)
 
 
-  // // const systemContent = `Te egy mesterséges intelligenciával működő asszisztens vagy, amely segít a bankszámlakivonatokról a tranzakciókat kigyűjteni dátum, tranzakció típusa, tranzakció megnevezése, kedvezményezett neve, bankszámlaszáma, megjegyzés és összeg alapján.`;
+//   const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise
 
-  const systemContent = `Te egy mesterséges intelligenciával működő asszisztens vagy, amely segít bankszámlakivonatokból a tranzakciós adatokat kinyerni és azokat strukturált formában (Értéknap, Tranzakció típusa, Tranzakció megnevezése, Partner neve, Partner bankszámlaszáma, Megjegyzés, Összeg) megadni.`;
+//   const extractedTexts = []
+//   const pageCount = pdfDoc.numPages
 
-  const prompt = `Kérlek, gyűjtsd ki a bankszámlakivonaton szereplő összes tranzakció részleteit az alábbi mezők szerint:
-    - Értéknap (ISO 8601 dátum, pl. "2024-09-05")
-    - Tranzakció típusa ("terhelés", "jóváírás")
-    - Tranzakció megnevezése
-    - Partner neve
-    - Partner bankszámlaszáma
-    - Megjegyzés
-    - Összeg
-
-    Az eredményt strukturált JSON formátumban add vissza az alábbi minta szerint:
-      {
-        "statement_data": {
-          "account": "HU93 1030 0002 1333 9078 0001 4908",
-          "currency": "HUF",
-          "statement_number": "2024/075",
-        },
-        "transactions":[
-          {
-            "datum": "2024-09-05",
-            "tipus": "terhelés",
-            "megnevezes": "GIRO átutalás jóváírása",
-            "partner": "FAKÉP BT",
-            "partner_bankszamlaszama": "HU07117050082042865900000000",
-            "megjegyzes": "E-Trium-2024-247",
-            "osszeg": 130510
-          },
-          {
-            "datum": "2024-09-05",
-            "tipus": "jóváírás",
-            "megnevezes": "Toke elszámolása",
-            "partner": "GEO-LOG KÖRNYEZETVÉD. ÉS GEOFIZ.KFT",
-            "partner_bankszamlaszama": "HU73117140062024733900000000",
-            "megjegyzes": "E-TRIUM-2024-203 szla",
-            "osszeg": 327919
-          }
-        ] 
-      }
-
-    Fontos megjegyzések:
-    1. Ha egy tranzakcióhoz tartozó adat hiányzik, az adott mezőt hagyd üresen ("").
-    2. Az eredmény tartalmazza a bankszámlakivonat összes tranzakcióját a bankszámlakivonaton szereplő sorrendben.
-    3. Az adatokat pontosan a megadott mezőnevekkel és formátumban add meg.
-    4. Ne használj kódblokkokat(\`\`\`), csak tiszta JSON-t adj vissza.
-
-    A bankszámlakivonat szöveges tartalma a következő:
-
-    ${docContent.text}
-  `
-
-  const messagesForPrompt = [{ role: "system", content: systemContent }, { role: "user", content: prompt }]
-
-  const completion = await openai.chat.completions.create({
-    messages: messagesForPrompt,
-    // model: "gpt-4o-mini",
-    model: "chatgpt-4o-latest",
-    // max_completion_tokens: 1500,
-    temperature: 0
-  })
-
-  console.log(completion.choices[0].message)
-  // // console.log(completion.choices[0].message.content)
-
-  // // const content = JSON.parse(completion.choices[0].message.content)
-  const rawContent = completion.choices[0].message.content.trim()
-  const cleanContent = rawContent.replace(/```json|```/g, ''); // Kódblokkok eltávolítása
-  const content = JSON.parse(cleanContent);
-  const transactionsArray = content.transactions
-
-  const statement_data = content.statement_data
-  const transactions = transactionsArray.map(transaction => {
-    return { ...transaction, id: uuidv4() }
-  })
-  // const transactions = content.map(transaction => {
-  //   return { ...transaction, id: uuidv4() }
-  // })
-
-  return { statement_data, transactions }
-
-}
-// export async function exportTransactionsTable(transactions) {
-
-//   console.log(transactions);
-
-//   try {
-
-//     const worksheet = XLSX.utils.json_to_sheet(transactions)
-
-//     const csv = XLSX.utils.sheet_to_csv(worksheet, {
-//       forceQuotes: true
+//   for (let i = 0; i < pageCount; i++) {
+//     const page = await pdfDoc.getPage(i + 1)
+//     // console.log(page);
+//     const textContent = await page.getTextContent()
+//     textContent.items.map(item => {
+//       extractedTexts.push(item.str)
 //     })
-
-//     const filename = "teszt"
-
-//     return new Response(csv, {
-//       status: 200,
-//       headers: {
-//         'Content-Disposition': `attachment; filename="${filename}.csv"`,
-//         'Content-Type': 'text/csv'
-//       }
-//     })
-//   } catch (error) {
-//     console.log(error);
 //   }
 
+//   const startIndex = extractedTexts.findIndex(text => text.startsWith("Kivonat száma:"))
+//   // const startIndex = extractedTexts.indexOf("Kivonat száma:")
+//   // const endIndex = extractedTexts.indexOf("Összesen:")
+//   const endIndex = extractedTexts.indexOf("Összesen:")
+
+//   const transactionsArr = extractedTexts.slice(startIndex, endIndex)
+//   const statementString = transactionsArr.join('\n')
+//   // console.log(transactionsArr);
+
+//   // for (let i = 0; i < firstPageText.length; i++) {
+
+//   // }
+
+//   // const docContentArray = docContent.text.split('\n')
+//   // const cleanedDocContent = docContentArray.map(row => {
+//   //   return row.replace(/(\d)\s+(\d)/g, '$1$2')
+//   //   // .replace(/(\d)\s+\./g, '$1.')
+//   //   // .replace(/([a-zA-Z])\s+(\d)/g, '$1 $2')
+//   // }).join('\n')
+
+//   // "statement_data": {
+//   //   "account": "HU93 1030 0002 1333 9078 0001 4908",
+//   //   "currency": "HUF",
+//   //   "statement_number": "2024/075",
+//   //   "opening_balance": 21410283,
+//   //   "closing_balance": 27022350
+//   // },
+//   // 4. Ne használj kódblokkokat(\`\`\`), csak tiszta JSON-t adj vissza.
+
+
+//   const systemContent = `Te egy mesterséges intelligenciával működő asszisztens vagy, amely segít bankszámlakivonatokból a tranzakciós adatokat kinyerni és azokat strukturált formában megadni.`;
+
+//   const prompt = `Kérlek, gyűjtsd ki a bankszámlakivonaton szereplő összes tranzakció részleteit az alábbi mezők szerint:
+//     - Értéknap (pl. "2024.09.05")
+//     - Tranzakció típusa ("terhelés", "jóváírás")
+//     - Tranzakció megnevezése
+//     - Partner neve
+//     - Partner bankszámlaszáma
+//     - Megjegyzés
+//     - Összeg
+
+//     Az eredményt strukturált JSON formátumban add vissza az alábbi minta szerint:
+//       {
+//         "statement_data": {
+//           "account": "HU93 1030 0002 1333 9078 0001 4908",
+//           "currency": "HUF",
+//           "statement_number": "2024/075",
+//           "opening_balance": 21410283,
+//           "closing_balance": 27022350
+//         },
+//         "transactions":[
+//           {
+//             "datum": "2024.09.05",
+//             "tipus": "terhelés",
+//             "megnevezes": "Betétlekötés",
+//             "partner": "FAKÉP BT",
+//             "partner_bankszamlaszama": "HU07117050082042865900000000",
+//             "megjegyzes": "Lekötés időtartalma: 20240828 - 20240904",
+//             "jogcim": "szla. kiegy.",
+//             "osszeg": 130510
+//           },
+//           {
+//             "datum": "2024.09.05",
+//             "tipus": "jóváírás",
+//             "megnevezes": "Toke elszámolása",
+//             "partner": "GEO-LOG KÖRNYEZETVÉD. ÉS GEOFIZ.KFT",
+//             "partner_bankszamlaszama": "HU73117140062024733900000000",
+//             "megjegyzes": "E-TRIUM-2024-203 szla",
+//             "jogcim": "bankköltség",
+//             "osszeg": 327919
+//           },
+//           {
+//             "datum": "2024.09.05",
+//             "tipus": "jóváírás",
+//             "megnevezes": "Toke elszámolása",
+//             "partner": "GEO-LOG KÖRNYEZETVÉD. ÉS GEOFIZ.KFT",
+//             "partner_bankszamlaszama": "HU73117140062024733900000000",
+//             "megjegyzes": "E-TRIUM-2024-203 szla",
+//             "jogcim": "betét",
+//             "osszeg": 327919
+//           }
+//         ] 
+//       }
+
+//     Fontos megjegyzések:
+//     1. Ha egy tranzakcióhoz tartozó adat hiányzik, az adott mezőt hagyd üresen ("").
+//     2. Az eredmény tartalmazza a bankszámlakivonat összes tranzakcióját a bankszámlakivonaton szereplő sorrendben.
+//     3. Az adatokat pontosan a megadott mezőnevekkel és formátumban add meg.
+//     4. Ne használj kódblokkokat(\`\`\`), csak tiszta JSON-t adj vissza.
+//     5. Ha a megnevezés "könyvelési díj" vagy szerepel benne, hogy "jutaléka", akkor a jogcím legyen "bankköltség"
+//     6. Ha a megnevezés "tőke elszámolás", "kamat elszámolás" vagy "betétlekötés", akkor a jogcím legyen "betét".
+//     7. Ha a megnevezés "tőke elszámolás", akkor az egy jóváírás és a megjegyzés legyen üres "tőke elszámolás".
+//     8. Ha a megnevezés "betét lekötés", akkor a megjegyzés legyen üres "betét lekötés".
+//     9. Ha a megnevezés "kamat elszámolás", akkor a megjegyzés legyen üres "kamat elszámolás".
+//     10. Ha a megnevezés tartalmazza, hogy "átutalás jóváírása", akkor a jogcím legyen "szla. kiegy.".
+
+//     A bankszámlakivonat szöveges tartalma a következő:
+
+//     ${statementString}
+//   `
+
+//   const messagesForPrompt = [{ role: "system", content: systemContent }, { role: "user", content: prompt }]
+
+//   const completion = await openai.chat.completions.create({
+//     messages: messagesForPrompt,
+//     model: "gpt-4o-mini",
+//     // model: "chatgpt-4o-latest",
+//     // max_completion_tokens: 1500,
+//     temperature: 0
+//   })
+
+//   // console.log(completion.choices[0].message)
+//   // // // console.log(completion.choices[0].message.content)
+
+//   // // // const content = JSON.parse(completion.choices[0].message.content)
+//   const rawContent = completion.choices[0].message.content.trim()
+//   const cleanContent = rawContent.replace(/```json|```/g, ''); // Kódblokkok eltávolítása
+//   const content = JSON.parse(cleanContent);
+//   const transactionsArray = content.transactions
+
+//   const statement_data = content.statement_data
+//   const transactions = transactionsArray.map(transaction => {
+//     return { ...transaction, id: uuidv4(), statement_number: statement_data.statement_number }
+//   })
+//   // // const transactions = content.map(transaction => {
+//   // //   return { ...transaction, id: uuidv4() }
+//   // // })
+
+//   return { statement_data, transactions }
+
+//   // return transactions
+
+//   // return null
+
 // }
+export async function getFileFromWeb({ formData }) {
+
+  // const file = formData.get('bank_statement')
+  // const pdfData = await file.arrayBuffer()
+  // const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise
+  // const pageCount = pdfDoc.numPages
+  // console.log(pageCount)
+
+  // const agent = new https.Agent({
+  //   rejectUnauthorized: false
+  // })
+  // console.log("on sever")
+  // const url = 'https://nav.gov.hu/pfile/file?path=/ugyfeliranytu/nezzen-utana/inf_fuz/informacios-fuzetek---2024/18.-informacios-fuzet---A-szamla-nyugta-kibocsatasanak-alapveto-szabalyai'
+  // const { data } = await axios.get(url, { responseType: 'arraybuffer', httpsAgent: agent })
+  // const pdfData = new Uint8Array(data);
+  // const pdfDoc = await pdfjsLib.getDocument({ data: pdfData }).promise
+  // const pageCount = pdfDoc.numPages
+  // console.log(pageCount)
+
+  // const page = await pdfDoc.getPage(4)
+  // const textContent = await page.getTextContent()
+
+  // const extractedTexts = []
+  // textContent.items.map(item => {
+  //   // console.log(item)
+  //   extractedTexts.push(item.str)
+  // })
+
+  // // // console.log(extractedTexts)
+  // // const doc = await PdfParse(data)
+  // // console.log(doc);
+
+  // return extractedTexts
+}
 
 
 
