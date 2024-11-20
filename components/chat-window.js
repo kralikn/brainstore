@@ -76,7 +76,7 @@ export default function ChatWindow({ topicId }) {
   return (
     <div className="grid grid-rows-[1fr,auto,auto] h-full border rounded-lg px-6 py-4 gap-4">
       <MessagesConatiner messagesEndRef={messagesEndRef} messages={messages} isPending={isPending} />
-      <div className="flex justify-between pl-2 w-2/4">
+      <div className="flex justify-between pl-2 w-3/4">
         <CardDescription className="text-xs">{`prompt tokes: ${tokens.prompt_tokens}`}</CardDescription>
         <CardDescription className="text-xs">{`completion tokes: ${tokens.completion_tokens}`}</CardDescription>
         <CardDescription className="text-xs">{`total tokes: ${tokens.total_tokens}`}</CardDescription>
