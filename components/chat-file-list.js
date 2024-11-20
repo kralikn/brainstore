@@ -28,10 +28,10 @@ export default function ChatFileList({ topicId }) {
     <Card className="h-full">
       <CardHeader>
         <CardTitle className="">Források</CardTitle>
-        <div className="flex h-5 items-center space-x-4 text-xs">
-          <CardDescription>{`${docsCount} dokumentum`}</CardDescription>
+        <div className="flex h-5 items-center space-x-4">
+          <CardDescription className="text-xs">{`${docsCount} dokumentum`}</CardDescription>
           <Separator orientation="vertical" />
-          <CardDescription>{`${notesCount} jegyzet`}</CardDescription>
+          <CardDescription className="text-xs">{`${notesCount} jegyzet`}</CardDescription>
         </div>
       </CardHeader>
       {(docs.length > 0) && <>
