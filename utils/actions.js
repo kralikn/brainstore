@@ -506,7 +506,8 @@ export async function generateChatResponse({ prevMessages, query, topicId }) {
     try {
       const completion = await openai.chat.completions.create({
         messages: messagesForPrompt,
-        model: "gpt-4o-2024-11-20",
+        model: "gpt-4o-mini",
+        // model: "gpt-4o-2024-11-20",
         // max_completion_tokens: 1500,
         temperature: 0
       })
