@@ -37,7 +37,7 @@ export default async function NotesPage({ params }) {
     <div className="flex flex-col gap-4">
       <Suspense fallback={<LoadingNotesListHeader />}>
         <HydrationBoundary state={dehydrate(queryClient)}>
-          <NotesPageHeader topicSlug={topicSlug} />
+          <NotesPageHeader topicSlug={topicSlug} url={`/dashboard/admin`} subTitle="Jegyzetek hozzáadása" />
         </HydrationBoundary>
       </Suspense>
       <div className="grid grid-cols-12 gap-4">

@@ -2,21 +2,25 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { deleteNote } from "@/utils/actions"
-import { FilePenLine, FileStack, Loader2, MessageSquareMore, SquarePen, StickyNote, Trash2 } from "lucide-react"
+import { FilePenLine, FileStack, Loader2, StickyNote, Trash2 } from "lucide-react"
 import { Button } from "./ui/button"
-// import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-// import { $getRoot, CLEAR_HISTORY_COMMAND } from 'lexical';
-
 import { useToast } from "@/hooks/use-toast"
 import { Tooltip, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 import Link from "next/link"
 import { TooltipContent } from "@radix-ui/react-tooltip"
 import { Badge } from "./ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 
-export default function NotesListItem({ note, topicSlug, setNoteTitle, setIsEditable }) {
 
-  // const [editor] = useLexicalComposerContext()
+export default function NotesListItem({ note, topicSlug, }) {
 
   const queryClient = useQueryClient()
   const { toast } = useToast()
@@ -33,22 +37,9 @@ export default function NotesListItem({ note, topicSlug, setNoteTitle, setIsEdit
       }
       toast({ description: data.message })
       queryClient.invalidateQueries({ queryKey: ['notes', topicSlug] })
-      // setNoteTitle('')
-      // setIsEditable(false)
-      // editor.update(() => {
-      //   $getRoot().clear();
-      //   editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
-      // });
     },
   })
 
-
-  const handleEditNote = () => {
-    // setNoteTitle(note.title)
-    // const parsedEditorState = editor.parseEditorState(note.editor_json)
-    // setIsEditable(true)
-    // editor.setEditorState(parsedEditorState)
-  }
   const handleDeleteNote = () => {
     mutate(note.id)
   }
@@ -61,32 +52,34 @@ export default function NotesListItem({ note, topicSlug, setNoteTitle, setIsEdit
         <div className="">{note.title}</div>
       </div>
       <div className="space-x-2">
-        <TooltipProvider>
+        {/* <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>
-              <Button size='sm' variant="" disabled={deleteIsPending}>
-                {false ? <Loader2 className="animate-spin" /> : <FileStack />}
-              </Button>
-            </TooltipTrigger>
+            <TooltipTrigger> */}
+        <Button size='sm' variant="" disabled={deleteIsPending}>
+          {false ? <Loader2 className="animate-spin" /> : <FileStack />}
+        </Button>
+        {/* </TooltipTrigger>
             <TooltipContent side='top' sideOffset={10}>
               <Badge variant="" className="px-3 py-1">Feldolgozás</Badge>
             </TooltipContent>
           </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
+        </TooltipProvider> */}
+
+        {/* <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>
-              <Button asChild size="sm" variant="">
-                <Link href={`/dashboard/admin`}>
-                  <FilePenLine />
-                </Link>
-              </Button>
-            </TooltipTrigger>
+            <TooltipTrigger> */}
+        <Button asChild size="sm" variant="">
+          <Link href={`/dashboard/admin/${topicSlug}/notes/${note.id}`}>
+            <FilePenLine />
+          </Link>
+        </Button>
+        {/* </TooltipTrigger>
             <TooltipContent side='top' sideOffset={10}>
               <Badge variant="" className="px-3 py-1">Szerkesztés</Badge>
             </TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider> */}
+
         <Button variant="destructive" size="sm" onClick={handleDeleteNote} disabled={deleteIsPending}>
           {deleteIsPending ? <Loader2 className="animate-spin" /> : <Trash2 />}
         </Button>

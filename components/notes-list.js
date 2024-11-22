@@ -26,18 +26,18 @@ export default function NotesList({ topicSlug }) {
       <CardHeader>
         <CardTitle className="text-xl">Jegyzetek</CardTitle>
       </CardHeader>
-      <CardContent className='space-y-4'>
+      <CardContent className=''>
         {notes.map(note => {
           return (
-            <>
-              <Separator className="" />
+            <div key={note.id} className="space-y-4">
+              <Separator className="mt-4" />
               <NotesListItem
-                key={note.id}
+
                 note={note}
                 topicSlug={topicSlug}
               />
               {/* <Separator className="" /> */}
-            </>
+            </div>
           )
         })}
       </CardContent>

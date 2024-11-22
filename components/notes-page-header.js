@@ -11,7 +11,7 @@ import FileUploadForm from './file-upload-form'
 import LoadingDocsListHeader from './loading-docs-list-header'
 import LoadingNotesListHeader from './loading-notes-list-header'
 
-export default function NotesPageHeader({ topicSlug }) {
+export default function NotesPageHeader({ topicSlug, url, subTitle }) {
 
   const { data, isLoading, isPending } = useQuery({
     queryKey: ['notes', topicSlug],
@@ -31,7 +31,7 @@ export default function NotesPageHeader({ topicSlug }) {
             variant='link'
             className="p-1 mb-1"
           >
-            <Link href={'/dashboard/admin'} className='flex items-center gap-x-2'>
+            <Link href={url} className='flex items-center gap-x-2'>
               <ChevronLeft size={32} /> Vissza
             </Link>
           </Button>
@@ -39,7 +39,7 @@ export default function NotesPageHeader({ topicSlug }) {
         <CardTitle className="px-1">
           {topicTitle}
         </CardTitle>
-        <CardDescription className="px-1">Jegyzetek hozzáadása</CardDescription>
+        <CardDescription className="px-1">{subTitle}</CardDescription>
       </CardHeader>
     </Card>
   )
