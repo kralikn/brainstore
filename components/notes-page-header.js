@@ -4,22 +4,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { useQuery } from '@tanstack/react-query'
-import { getFiles } from '@/utils/actions'
+import { getFiles, getNotes } from '@/utils/actions'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import FileUploadForm from './file-upload-form'
 import LoadingDocsListHeader from './loading-docs-list-header'
+import LoadingNotesListHeader from './loading-notes-list-header'
 
 export default function NotesPageHeader({ topicSlug }) {
 
   const { data, isLoading, isPending } = useQuery({
-    queryKey: ['topic', topicSlug],
-    queryFn: () => getFiles(topicSlug),
+    queryKey: ['notes', topicSlug],
+    queryFn: () => getNotes(topicSlug),
   })
 
   const topicTitle = data?.topicTitle || ""
 
-  if (isLoading || isPending) return <LoadingDocsListHeader />
+  if (isLoading || isPending) return <LoadingNotesListHeader />
 
   return (
     <Card className="bg-gray-50 border-none flex justify-between items-end">
@@ -40,9 +41,6 @@ export default function NotesPageHeader({ topicSlug }) {
         </CardTitle>
         <CardDescription className="px-1">Jegyzetek hozzáadása</CardDescription>
       </CardHeader>
-      {/* <CardContent className="flex mt-8">
-        <FileUploadForm topicSlug={topicSlug} />
-      </CardContent> */}
     </Card>
   )
 }

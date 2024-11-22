@@ -50,7 +50,8 @@ export default function TopicCard({ topic }) {
             <Tooltip>
               <TooltipTrigger>
                 <Button asChild size='sm'>
-                  <Link href={`/dashboard/admin/documents/${topic.folder_name}`}>
+                  <Link href={`/dashboard/admin/${topic.folder_name}/documents`}>
+                    {/* <Link href={`/dashboard/admin/documents/${topic.folder_name}`}> */}
                     <FilePlus2 />
                   </Link>
                 </Button>
@@ -65,7 +66,8 @@ export default function TopicCard({ topic }) {
             <Tooltip>
               <TooltipTrigger>
                 <Button asChild size='sm'>
-                  <Link href={`/dashboard/admin/notes/${topic.folder_name}`}>
+                  <Link href={`/dashboard/admin/${topic.folder_name}/notes`}>
+                    {/* <Link href={`/dashboard/admin/notes/${topic.folder_name}`}> */}
                     <SquarePen />
                   </Link>
                 </Button>

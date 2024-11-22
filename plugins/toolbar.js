@@ -202,14 +202,14 @@ export default function ToolbarPlugin() {
         >
           <Underline className="h-4 w-4" />
         </Button >
-        <Button
+        {/* <Button
           variant="outline"
           size='sm'
           value="strikethrough"
           onClick={() => { editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough') }}
         >
           <Strikethrough className="h-4 w-4" />
-        </Button >
+        </Button > */}
       </div>
 
       <div className=' '>
