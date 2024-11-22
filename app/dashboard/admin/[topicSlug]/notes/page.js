@@ -1,4 +1,5 @@
 import Editor from "@/components/editor";
+import LoadingNotes from "@/components/loading-notes";
 import LoadingNotesListHeader from "@/components/loading-notes-list-header";
 import NoteEditorContainer from "@/components/note-editor-container";
 import NotesList from "@/components/notes-list";
@@ -42,7 +43,7 @@ export default async function NotesPage({ params }) {
       <div className="grid grid-cols-12 gap-4">
         {/* <Editor topicSlug={topicSlug} /> */}
         <NoteEditorContainer topicSlug={topicSlug} />
-        <Suspense fallback={<p>Jegyzetek letöltése...</p>}>
+        <Suspense fallback={<LoadingNotes />}>
           <HydrationBoundary state={dehydrate(queryClient)}>
             <NotesListFunction topicSlug={topicSlug} />
           </HydrationBoundary>

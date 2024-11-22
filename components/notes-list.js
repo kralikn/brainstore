@@ -5,6 +5,8 @@ import LoadingNotesListHeader from "./loading-notes-list-header"
 import { getNotes } from "@/utils/actions"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import NotesListItem from "./notes-list-item"
+import LoadingNotes from "./loading-notes"
+import { Separator } from "./ui/separator"
 
 export default function NotesList({ topicSlug }) {
 
@@ -17,21 +19,25 @@ export default function NotesList({ topicSlug }) {
 
   console.log(data);
 
-  if (isLoading || isPending) return <p>Jegyzetek letöltése...</p>
+  if (isLoading || isPending) return <LoadingNotes />
 
   return (
     <Card className='w-full h-full'>
       <CardHeader>
         <CardTitle className="text-xl">Jegyzetek</CardTitle>
       </CardHeader>
-      <CardContent className='space-y-2'>
+      <CardContent className='space-y-4'>
         {notes.map(note => {
           return (
-            <NotesListItem
-              key={note.id}
-              note={note}
-              topicSlug={topicSlug}
-            />
+            <>
+              <Separator className="" />
+              <NotesListItem
+                key={note.id}
+                note={note}
+                topicSlug={topicSlug}
+              />
+              {/* <Separator className="" /> */}
+            </>
           )
         })}
       </CardContent>
